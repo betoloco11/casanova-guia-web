@@ -6,6 +6,7 @@ import { CATEGORIES } from '../constants';
 import { Business, Promotion, Category, Page } from '../types';
 import { getBusinesses, getPromotions } from '../services/mockApiService';
 import { ChevronLeftIcon, UserCircleIcon } from '../components/Icons';
+import { useAppContext } from '../context/AppContext';
 
 const PromotionCard: React.FC<{promotion: Promotion, onSelect: (id: string) => void}> = ({ promotion, onSelect }) => (
     <div 
@@ -67,6 +68,7 @@ const HomePage: React.FC<HomePageProps> = ({
   session,
   navigateTo
 }) => {
+  const { profile } = useAppContext();
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [promotions, setPromotions] = useState<Promotion[]>([]);
   const [loading, setLoading] = useState(true);
@@ -112,7 +114,7 @@ const HomePage: React.FC<HomePageProps> = ({
               onClick={() => navigateTo?.('profile')}
               className="w-8 h-8 rounded-full bg-blue-600 dark:bg-yellow-400 flex items-center justify-center text-white dark:text-slate-950 font-black text-[10px]"
             >
-              {profile.name.charAt(0)}
+              {profile?.name?.charAt(0) || 'U'}
             </button>
           )}
         </div>
