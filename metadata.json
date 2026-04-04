@@ -1,0 +1,5 @@
+{
+  "name": "Casanova Guía Web",
+  "description": "A responsive web application that serves as a directory for neighborhood commerce in Isidro Casanova, featuring promotions, categories, and business details. Built with React, TypeScript, and Supabase.",
+  "requestFramePermissions": []
+}

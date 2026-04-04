@@ -1,0 +1,46 @@
+
+<!DOCTYPE html>
+<!-- BUILD: 2026-04-02T09:17:50Z -->
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <title>Casanova Guía Web v2.4.1 (BUILD 09:17)</title>
+    <script>
+      // Force unregister service workers and clear caches
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for(let registration of registrations) {
+            registration.unregister();
+            console.log('ServiceWorker unregistered');
+          }
+        });
+      }
+      if ('caches' in window) {
+        caches.keys().then(function(names) {
+          for (let name of names) {
+            caches.delete(name);
+            console.log('Cache cleared:', name);
+          }
+        });
+      }
+
+      if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    </script>
+  </head>
+  <body class="transition-colors duration-300">
+    <div id="version-check-bar" style="background: #ef4444; color: white; text-align: center; font-size: 12px; font-weight: bold; padding: 4px; position: fixed; top: 0; left: 0; right: 0; z-index: 9999; pointer-events: none;">
+      VERSIÓN 2.4.1 - SI VES ESTO, EL HTML ESTÁ ACTUALIZADO (09:17)
+    </div>
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
