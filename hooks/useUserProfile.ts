@@ -111,7 +111,6 @@ export const useUserProfile = () => {
         setIsSynced(true);
       } catch (error: any) {
         console.error("Error updating profile in Supabase:", error);
-        alert("Error al actualizar los puntos/perfil: " + (error.message || "Error desconocido"));
         setIsSynced(false);
       }
     }

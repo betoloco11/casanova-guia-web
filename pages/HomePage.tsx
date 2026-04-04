@@ -108,7 +108,7 @@ const HomePage: React.FC<HomePageProps> = ({
     <div className="space-y-10 transition-colors duration-300">
       <div className="px-4 pt-8">
         <div className="flex justify-between items-center mb-4">
-          <span className="text-[10px] font-black text-gray-400 dark:text-slate-600 uppercase tracking-widest">v2.4.1 (BUILD 09:04)</span>
+          <div></div>
           {session && (
             <button 
               onClick={() => navigateTo?.('profile')}
@@ -121,7 +121,7 @@ const HomePage: React.FC<HomePageProps> = ({
         {!session && !isSearching && (
           <div className="mb-6 bg-slate-900 dark:bg-slate-900 rounded-[28px] p-6 shadow-xl overflow-hidden relative group border border-slate-800 text-center">
             <div className="relative z-10 flex flex-col items-center">
-              <h3 className="text-white text-2xl font-medium tracking-tight leading-none mb-3">¡Hola, cliente! 👋</h3>
+              <h3 className="text-white text-2xl font-medium tracking-tight leading-none mb-3">¡Hola, vecino! 👋</h3>
               <p className="text-slate-400 text-[11px] font-black uppercase tracking-tight leading-tight mb-5 whitespace-nowrap">
                 CREA TU CUENTA GRATIS Y COMIENZA A SUMAR PUNTOS!
               </p>

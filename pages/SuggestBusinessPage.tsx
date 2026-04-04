@@ -2,10 +2,12 @@
 import React, { useState } from 'react';
 import { ChevronLeftIcon, MapIcon, ArrowRightIcon } from '../components/Icons';
 import { supabase } from '../services/supabaseClient';
+import Modal from '../components/Modal';
 
 const SuggestBusinessPage: React.FC<{ goBack: () => void }> = ({ goBack }) => {
     const [submitted, setSubmitted] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [showErrorModal, setShowErrorModal] = useState<string | null>(null);
     const [formData, setFormData] = useState({
         name: '',
         category: '',
@@ -14,7 +16,7 @@ const SuggestBusinessPage: React.FC<{ goBack: () => void }> = ({ goBack }) => {
 
     const handleSubmit = async () => {
         if (!formData.name || !formData.category) {
-            alert("Por favor completa al menos el nombre y rubro.");
+            setShowErrorModal("Por favor completa al menos el nombre y rubro.");
             return;
         }
 
@@ -36,7 +38,7 @@ const SuggestBusinessPage: React.FC<{ goBack: () => void }> = ({ goBack }) => {
             setSubmitted(true);
         } catch (error) {
             console.error("Error al enviar sugerencia:", error);
-            alert("Error al enviar la sugerencia. Por favor intenta de nuevo.");
+            setShowErrorModal("Error al enviar la sugerencia. Por favor intenta de nuevo.");
         } finally {
             setLoading(false);
         }
@@ -133,6 +135,23 @@ const SuggestBusinessPage: React.FC<{ goBack: () => void }> = ({ goBack }) => {
                     </button>
                 </div>
             </div>
+
+            <Modal
+                isOpen={!!showErrorModal}
+                onClose={() => setShowErrorModal(null)}
+                title="Atención"
+                type="warning"
+                footer={
+                    <button 
+                        onClick={() => setShowErrorModal(null)}
+                        className="w-full py-4 bg-blue-600 dark:bg-indigo-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg active:scale-95 transition-all"
+                    >
+                        Entendido
+                    </button>
+                }
+            >
+                <p>{showErrorModal}</p>
+            </Modal>
         </div>
     );
 };

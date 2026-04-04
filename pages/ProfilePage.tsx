@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Page } from '../types';
 import { 
     ArrowRightIcon, 
@@ -15,6 +15,7 @@ import {
 } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
 import { supabase } from '../services/supabaseClient';
+import Modal from '../components/Modal';
 
 interface ProfilePageProps {
     navigateTo: (page: Page) => void;
@@ -57,6 +58,8 @@ const SectionHeader: React.FC<{title: string, subtitle: string}> = ({title, subt
 
 const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, goBack }) => {
   const { profile, favoriteIds, allReviews, refreshData } = useAppContext();
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState<string | null>(null);
 
   // Calcular total de reseñas del usuario
   const userReviewsCount = React.useMemo(() => {
@@ -95,14 +98,6 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, goBack }) => {
   };
 
   const handleDeleteAccount = async () => {
-    const confirmed = window.confirm(
-        "¿Estás seguro de que quieres eliminar tu perfil? \n\n" +
-        "Esto borrará tus datos de usuario en la aplicación. \n" +
-        "IMPORTANTE: Para eliminar completamente tu cuenta de acceso, también debes borrarla desde el panel de Supabase si eres el administrador."
-    );
-
-    if (!confirmed) return;
-
     try {
         const { data: { session } } = await supabase.auth.getSession();
         if (session) {
@@ -119,7 +114,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, goBack }) => {
         await handleLogout();
     } catch (error) {
         console.error("Error al eliminar cuenta:", error);
-        alert("Hubo un error al intentar eliminar tu perfil. Por favor, intenta cerrar sesión primero.");
+        setShowErrorModal("Hubo un error al intentar eliminar tu perfil. Por favor, intenta cerrar sesión primero.");
     }
   };
 
@@ -231,12 +226,12 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, goBack }) => {
                     label="Eliminar Perfil" 
                     value="Borrar tus datos de la app" 
                     destructive 
-                    onClick={handleDeleteAccount}
+                    onClick={() => setShowDeleteModal(true)}
                 />
             </div>
 
             <SectionHeader title="Herramientas" subtitle="Utilidades del sistema" />
-            <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-[48px] overflow-hidden shadow-sm border border-white dark:border-slate-800 transition-colors duration-300">
+            <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-[48px] overflow-hidden shadow-sm border border-white dark:border-slate-700 transition-colors duration-300">
                 <MenuOption 
                     icon={<BadgeIcon className="text-blue-500 dark:text-yellow-400" />} 
                     label="Refrescar App" 
@@ -277,6 +272,52 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, goBack }) => {
                 </button>
             </div>
         </div>
+
+        {/* Modales */}
+        <Modal
+            isOpen={showDeleteModal}
+            onClose={() => setShowDeleteModal(false)}
+            title="¿Eliminar Perfil?"
+            type="danger"
+            footer={
+                <>
+                    <button 
+                        onClick={handleDeleteAccount}
+                        className="w-full py-4 bg-red-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg active:scale-95 transition-all"
+                    >
+                        Sí, Eliminar Perfil
+                    </button>
+                    <button 
+                        onClick={() => setShowDeleteModal(false)}
+                        className="w-full py-4 bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400 rounded-2xl font-black text-xs uppercase tracking-widest active:scale-95 transition-all"
+                    >
+                        Cancelar
+                    </button>
+                </>
+            }
+        >
+            <p>Esta acción borrará tus datos de usuario en la aplicación.</p>
+            <p className="mt-4 text-xs font-bold opacity-70 italic">
+                IMPORTANTE: Para eliminar completamente tu cuenta de acceso, también debes borrarla desde el panel de Supabase si eres el administrador.
+            </p>
+        </Modal>
+
+        <Modal
+            isOpen={!!showErrorModal}
+            onClose={() => setShowErrorModal(null)}
+            title="Error"
+            type="danger"
+            footer={
+                <button 
+                    onClick={() => setShowErrorModal(null)}
+                    className="w-full py-4 bg-blue-600 dark:bg-yellow-400 text-white dark:text-slate-950 rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg active:scale-95 transition-all"
+                >
+                    Entendido
+                </button>
+            }
+        >
+            <p>{showErrorModal}</p>
+        </Modal>
     </div>
   );
 };
