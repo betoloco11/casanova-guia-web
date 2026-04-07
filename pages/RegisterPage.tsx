@@ -15,6 +15,7 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ navigateTo }) => {
     const [role, setRole] = useState<'client' | 'merchant'>('client');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
     const handleGoogleLogin = async () => {
         setLoading(true);
@@ -71,7 +72,12 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ navigateTo }) => {
             }
 
             setLoading(false);
-            navigateTo('home');
+            
+            if (data.user && !data.session) {
+                setSuccessMessage("¡Cuenta creada! Por favor, revisa tu email para confirmar tu cuenta antes de iniciar sesión.");
+            } else {
+                navigateTo('home');
+            }
         } catch (err: any) {
             console.error("Error en registro:", err);
             
@@ -133,74 +139,95 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ navigateTo }) => {
                         </div>
                     )}
 
-                    <div>
-                        <label className="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest ml-4 mb-2 block">Nombre Completo</label>
-                        <input 
-                            type="text" 
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            className="w-full bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-[32px] p-6 text-sm font-bold text-gray-800 dark:text-slate-100 focus:outline-none focus:ring-4 focus:ring-blue-100 dark:focus:ring-yellow-400/20 transition-all shadow-sm"
-                            placeholder="Tu nombre"
-                            required
-                        />
-                    </div>
-
-                    <div>
-                        <label className="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest ml-4 mb-2 block">Soy un...</label>
-                        <div className="grid grid-cols-2 gap-3">
+                    {successMessage && (
+                        <div className="bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-900/30 p-8 rounded-[40px] text-green-700 dark:text-green-400 text-sm font-bold text-center space-y-6 shadow-xl">
+                            <div className="w-16 h-16 bg-green-100 dark:bg-green-900/50 rounded-full flex items-center justify-center mx-auto">
+                                <svg className="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                            </div>
+                            <p className="leading-relaxed">{successMessage}</p>
                             <button 
-                                type="button"
-                                onClick={() => setRole('client')}
-                                className={`py-4 rounded-2xl font-black text-xs uppercase tracking-widest border transition-all ${role === 'client' ? 'bg-blue-600 dark:bg-yellow-400 text-white dark:text-slate-950 border-blue-600 dark:border-yellow-400 shadow-lg' : 'bg-white dark:bg-slate-800 text-gray-400 dark:text-slate-500 border-gray-100 dark:border-slate-800'}`}
+                                onClick={() => navigateTo('login')}
+                                className="w-full py-5 bg-green-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg shadow-green-200 dark:shadow-none active:scale-95 transition-all"
                             >
-                                Cliente
-                            </button>
-                            <button 
-                                type="button"
-                                onClick={() => setRole('merchant')}
-                                className={`py-4 rounded-2xl font-black text-xs uppercase tracking-widest border transition-all ${role === 'merchant' ? 'bg-blue-600 dark:bg-yellow-400 text-white dark:text-slate-950 border-blue-600 dark:border-yellow-400 shadow-lg' : 'bg-white dark:bg-slate-800 text-gray-400 dark:text-slate-500 border-gray-100 dark:border-slate-800'}`}
-                            >
-                                Comerciante
+                                Ir al Inicio de Sesión
                             </button>
                         </div>
-                    </div>
+                    )}
 
-                    <div>
-                        <label className="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest ml-4 mb-2 block">Email</label>
-                        <input 
-                            type="email" 
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className="w-full bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-[32px] p-6 text-sm font-bold text-gray-800 dark:text-slate-100 focus:outline-none focus:ring-4 focus:ring-blue-100 dark:focus:ring-yellow-400/20 transition-all shadow-sm"
-                            placeholder="tu@email.com"
-                            required
-                        />
-                    </div>
+                    {!successMessage && (
+                        <>
+                            <div>
+                                <label className="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest ml-4 mb-2 block">Nombre Completo</label>
+                                <input 
+                                    type="text" 
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                    className="w-full bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-[32px] p-6 text-sm font-bold text-gray-800 dark:text-slate-100 focus:outline-none focus:ring-4 focus:ring-blue-100 dark:focus:ring-yellow-400/20 transition-all shadow-sm"
+                                    placeholder="Tu nombre"
+                                    required
+                                />
+                            </div>
 
-                    <div>
-                        <label className="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest ml-4 mb-2 block">Crea una Contraseña</label>
-                        <input 
-                            type="password" 
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className="w-full bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-[32px] p-6 text-sm font-bold text-gray-800 dark:text-slate-100 focus:outline-none focus:ring-4 focus:ring-blue-100 dark:focus:ring-yellow-400/20 transition-all shadow-sm"
-                            placeholder="Mínimo 6 caracteres"
-                            minLength={6}
-                            required
-                        />
-                    </div>
+                            <div>
+                                <label className="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest ml-4 mb-2 block">Soy un...</label>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <button 
+                                        type="button"
+                                        onClick={() => setRole('client')}
+                                        className={`py-4 rounded-2xl font-black text-xs uppercase tracking-widest border transition-all ${role === 'client' ? 'bg-blue-600 dark:bg-yellow-400 text-white dark:text-slate-950 border-blue-600 dark:border-yellow-400 shadow-lg' : 'bg-white dark:bg-slate-800 text-gray-400 dark:text-slate-500 border-gray-100 dark:border-slate-800'}`}
+                                    >
+                                        Cliente
+                                    </button>
+                                    <button 
+                                        type="button"
+                                        onClick={() => setRole('merchant')}
+                                        className={`py-4 rounded-2xl font-black text-xs uppercase tracking-widest border transition-all ${role === 'merchant' ? 'bg-blue-600 dark:bg-yellow-400 text-white dark:text-slate-950 border-blue-600 dark:border-yellow-400 shadow-lg' : 'bg-white dark:bg-slate-800 text-gray-400 dark:text-slate-500 border-gray-100 dark:border-slate-800'}`}
+                                    >
+                                        Comerciante
+                                    </button>
+                                </div>
+                            </div>
 
-                    <button 
-                        type="submit"
-                        disabled={loading}
-                        className={`w-full py-6 rounded-[32px] font-black text-sm uppercase tracking-widest shadow-xl transition-all ${
-                            loading 
-                                ? 'bg-blue-300 dark:bg-yellow-900/50 cursor-not-allowed text-white/50' 
-                                : 'bg-blue-600 dark:bg-yellow-400 text-white dark:text-slate-950 shadow-blue-200 dark:shadow-slate-900 active:scale-95'
-                        }`}
-                    >
-                        {loading ? 'Registrando...' : 'Comenzar Ahora'}
-                    </button>
+                            <div>
+                                <label className="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest ml-4 mb-2 block">Email</label>
+                                <input 
+                                    type="email" 
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    className="w-full bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-[32px] p-6 text-sm font-bold text-gray-800 dark:text-slate-100 focus:outline-none focus:ring-4 focus:ring-blue-100 dark:focus:ring-yellow-400/20 transition-all shadow-sm"
+                                    placeholder="tu@email.com"
+                                    required
+                                />
+                            </div>
+
+                            <div>
+                                <label className="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest ml-4 mb-2 block">Crea una Contraseña</label>
+                                <input 
+                                    type="password" 
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    className="w-full bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-[32px] p-6 text-sm font-bold text-gray-800 dark:text-slate-100 focus:outline-none focus:ring-4 focus:ring-blue-100 dark:focus:ring-yellow-400/20 transition-all shadow-sm"
+                                    placeholder="Mínimo 6 caracteres"
+                                    minLength={6}
+                                    required
+                                />
+                            </div>
+
+                            <button 
+                                type="submit"
+                                disabled={loading}
+                                className={`w-full py-6 rounded-[32px] font-black text-sm uppercase tracking-widest shadow-xl transition-all ${
+                                    loading 
+                                        ? 'bg-blue-300 dark:bg-yellow-900/50 cursor-not-allowed text-white/50' 
+                                        : 'bg-blue-600 dark:bg-yellow-400 text-white dark:text-slate-950 shadow-blue-200 dark:shadow-slate-900 active:scale-95'
+                                }`}
+                            >
+                                {loading ? 'Registrando...' : 'Comenzar Ahora'}
+                            </button>
+                        </>
+                    )}
                 </form>
             </div>
         </div>

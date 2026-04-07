@@ -28,7 +28,7 @@ const WriteReviewPage: React.FC<WriteReviewPageProps> = ({ business, goBack, onS
     try {
         if (onSaveReview) {
             await onSaveReview({
-                authorName: `Tú (${profile.role === 'merchant' ? 'Comerciante' : 'Cliente'})`,
+                authorName: profile.name || 'Usuario de Casanova',
                 authorImage: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&q=80',
                 rating,
                 comment

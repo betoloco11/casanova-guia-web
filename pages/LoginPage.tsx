@@ -58,8 +58,8 @@ const LoginPage: React.FC<LoginPageProps> = ({ navigateTo }) => {
             let userMessage = "Error al iniciar sesión";
             if (err.message === "Failed to fetch" || err.status === 0) {
                 userMessage = "Error de conexión: Verifica tu internet o desactiva bloqueadores de anuncios.";
-            } else if (err.status === 400 || err.code === 'invalid_credentials') {
-                userMessage = 'Credenciales incorrectas. Verifica tu email y contraseña.';
+            } else if (err.status === 400 || err.code === 'invalid_credentials' || err.message?.includes('Invalid login credentials')) {
+                userMessage = 'Credenciales incorrectas. ¿Ya tienes una cuenta? Si no, ve a "Crear Cuenta Gratis" abajo.';
             } else {
                 userMessage = err.message || userMessage;
             }

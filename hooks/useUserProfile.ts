@@ -42,7 +42,14 @@ export const useUserProfile = () => {
 
     // 2. Intentar cargar desde Supabase si está configurado
     const { data: { session } } = await supabase.auth.getSession();
-    if (session && isSupabaseConfigured()) {
+    
+    if (!session) {
+      setProfile(DEFAULT_PROFILE);
+      setIsSynced(false);
+      return;
+    }
+
+    if (isSupabaseConfigured()) {
       try {
         const { data, error } = await supabase
           .from('profiles')
@@ -50,17 +57,19 @@ export const useUserProfile = () => {
           .eq('id', session.user.id)
           .single();
 
-        if (error && error.code !== 'PGRST116') throw error; // PGRST116 is "no rows returned"
+        if (error && error.code !== 'PGRST116') throw error;
 
         if (data) {
-          setProfile(data as UserProfile);
+          const loadedProfile = data as UserProfile;
+          setProfile(loadedProfile);
           setIsSynced(true);
-          localStorage.setItem(USER_PROFILE_KEY, JSON.stringify(data));
+          localStorage.setItem(USER_PROFILE_KEY, JSON.stringify(loadedProfile));
         } else {
           // Si no existe el perfil, crearlo con los datos de la sesión
           const userRole = session.user.user_metadata?.role || 'client';
           const initialProfile: UserProfile = {
             ...DEFAULT_PROFILE,
+            id: session.user.id,
             name: session.user.user_metadata?.full_name || (userRole === 'merchant' ? 'Comerciante de Casanova' : 'Cliente de Casanova'),
             email: session.user.email || '',
             role: userRole
@@ -78,6 +87,8 @@ export const useUserProfile = () => {
         }
       } catch (error) {
         console.error("Error loading profile from Supabase:", error);
+        // En caso de error, al menos aseguramos que el ID sea el correcto de la sesión actual
+        setProfile(prev => ({ ...prev, id: session.user.id, email: session.user.email || '' }));
       }
     }
   }, []);

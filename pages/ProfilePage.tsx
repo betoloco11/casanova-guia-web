@@ -64,15 +64,17 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, goBack }) => {
   // Calcular total de reseñas del usuario
   const userReviewsCount = React.useMemo(() => {
     let count = 0;
-    if (!allReviews) return 0;
+    if (!allReviews || !profile?.id) return 0;
+    
+    console.log("DEBUG - Profile ID:", profile.id);
     
     Object.values(allReviews).forEach(businessReviews => {
       if (Array.isArray(businessReviews)) {
         businessReviews.forEach(review => {
-          const isOwner = profile?.id && review.userId === profile.id;
-          const isYou = review.authorName?.includes('Tú');
-          if (isOwner || isYou) {
+          const isOwner = review.userId === profile.id;
+          if (isOwner) {
             count++;
+            console.log("DEBUG - Match found for review:", review.id, "with userId:", review.userId);
           }
         });
       }
@@ -82,8 +84,8 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, goBack }) => {
 
   const handleLogout = async () => {
     try {
-        // Limpiamos el cache local del perfil inmediatamente
-        localStorage.removeItem('casanova_user_profile');
+        // Limpiamos todo el cache local inmediatamente
+        localStorage.clear();
         
         // Intentamos cerrar sesión en Supabase
         await supabase.auth.signOut();
@@ -142,6 +144,11 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, goBack }) => {
                     <h2 className="text-3xl font-black text-gray-800 dark:text-slate-100 tracking-tighter leading-none">
                         {profile?.name === 'Cliente de Casanova' && profile?.role === 'merchant' ? 'Comerciante de Casanova' : (profile?.name || 'Cargando...')}
                     </h2>
+                    <div className="mt-2 p-2 bg-red-100 dark:bg-red-900/30 rounded-lg border border-red-200 dark:border-red-800">
+                        <p className="text-[10px] font-bold text-red-600 dark:text-red-400 uppercase">Cuenta Activa (Debug):</p>
+                        <p className="text-xs font-black text-gray-700 dark:text-slate-300 lowercase">{profile?.email || 'Sin Email'}</p>
+                        <p className="text-[8px] text-gray-400 font-mono mt-1 truncate">ID: {profile?.id || 'Sin ID'}</p>
+                    </div>
                     <p className="text-blue-600 dark:text-yellow-400 text-xs font-black uppercase tracking-[0.2em] mt-3 bg-white/80 dark:bg-slate-800/80 px-4 py-2 rounded-full w-fit border border-white dark:border-slate-700 shadow-sm transition-colors duration-300">
                         {profile?.role === 'merchant' ? 'Comerciante Destacado' : 'Cliente Destacado'}
                     </p>

@@ -72,6 +72,7 @@ export const useReviews = () => {
     const newReview: Review = {
       ...review,
       id: tempId,
+      userId: session.user.id,
       date: formattedDate,
       likes: 0,
       comments: 0
@@ -101,7 +102,6 @@ export const useReviews = () => {
         if (error) throw error;
       } catch (error: any) {
         console.error("Error saving review to Supabase:", error);
-        alert("Error al guardar la reseña en la base de datos: " + (error.message || "Error desconocido"));
       }
     }
   }, []);

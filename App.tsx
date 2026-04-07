@@ -61,10 +61,15 @@ const AppContent: React.FC = () => {
     });
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setSession(session);
       setAuthLoading(false);
       clearTimeout(timeout);
+      
+      // Si el usuario cambia, refrescamos todos los datos para evitar "fantasmas"
+      if (session) {
+        await refreshData();
+      }
     });
 
     return () => {

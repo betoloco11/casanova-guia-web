@@ -22,9 +22,8 @@ const UserReviewsPage: React.FC<UserReviewsPageProps> = ({ goBack }) => {
                 reviews.forEach(r => {
                     // Solo incluimos las reseñas que pertenecen al usuario actual
                     const isOwner = profile?.id && r.userId === profile.id;
-                    const isYou = r.authorName?.includes('Tú');
                     
-                    if (isOwner || isYou) {
+                    if (isOwner) {
                         list.push({ 
                             ...r, 
                             businessId, 

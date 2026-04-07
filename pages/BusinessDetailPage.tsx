@@ -2,6 +2,7 @@
 import React, { useState, useMemo } from 'react';
 import { Business, Review } from '../types';
 import { ChevronLeftIcon, StarIcon, ChatAltIcon, NavigationIcon } from '../components/Icons';
+import { useAppContext } from '../context/AppContext';
 
 interface BusinessDetailPageProps {
   business: Business;
@@ -31,28 +32,35 @@ const InfoRow: React.FC<{label: string; value: string; onClick?: () => void}> = 
     </div>
 );
 
-const ReviewCard: React.FC<{review: Review}> = ({review}) => (
-    <div className="py-8 border-b border-blue-50 dark:border-slate-700 last:border-0">
-        <div className="flex items-start space-x-5">
-            <img src={review.authorImage} alt={review.authorName} className="w-14 h-14 rounded-2xl object-cover shadow-sm" />
-            <div className="flex-1">
-                <div className="flex justify-between items-center">
-                    <div>
-                        <h4 className="font-black text-gray-800 dark:text-slate-100 text-base tracking-tight">{review.authorName}</h4>
-                        <p className="text-xs font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest mt-1">{review.date}</p>
+const ReviewCard: React.FC<{review: Review, currentUserId?: string}> = ({review, currentUserId}) => {
+    const isYou = currentUserId && review.userId === currentUserId;
+    
+    return (
+        <div className="py-8 border-b border-blue-50 dark:border-slate-700 last:border-0">
+            <div className="flex items-start space-x-5">
+                <img src={review.authorImage} alt={review.authorName} className="w-14 h-14 rounded-2xl object-cover shadow-sm" />
+                <div className="flex-1">
+                    <div className="flex justify-between items-center">
+                        <div>
+                            <h4 className="font-black text-gray-800 dark:text-slate-100 text-base tracking-tight">
+                                {isYou ? 'Tú' : review.authorName}
+                            </h4>
+                            <p className="text-xs font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest mt-1">{review.date}</p>
+                        </div>
+                        <div className="bg-yellow-50 dark:bg-slate-800 px-3 py-1 rounded-lg flex items-center border dark:border-slate-700">
+                            <StarIcon className="w-4 h-4 text-yellow-500 mr-1" />
+                            <span className="text-sm font-black text-yellow-700 dark:text-yellow-500">{review.rating}</span>
+                        </div>
                     </div>
-                    <div className="bg-yellow-50 dark:bg-slate-800 px-3 py-1 rounded-lg flex items-center border dark:border-slate-700">
-                        <StarIcon className="w-4 h-4 text-yellow-500 mr-1" />
-                        <span className="text-sm font-black text-yellow-700 dark:text-yellow-500">{review.rating}</span>
-                    </div>
+                    <p className="mt-4 text-gray-700 dark:text-slate-300 text-base leading-relaxed font-medium">{review.comment}</p>
                 </div>
-                <p className="mt-4 text-gray-700 dark:text-slate-300 text-base leading-relaxed font-medium">{review.comment}</p>
             </div>
         </div>
-    </div>
-)
+    );
+}
 
 const BusinessDetailPage: React.FC<BusinessDetailPageProps> = ({ business, goBack, navigateToReview, customReviews = [] }) => {
+  const { profile } = useAppContext();
   const [imgError, setImgError] = useState(false);
 
   const mergedReviews = useMemo(() => {
@@ -162,7 +170,7 @@ const BusinessDetailPage: React.FC<BusinessDetailPageProps> = ({ business, goBac
                 </div>
                 <div className="bg-white/50 dark:bg-slate-800/40 backdrop-blur-sm rounded-[40px] px-8 border border-white dark:border-slate-700 transition-colors duration-300">
                     {mergedReviews.length > 0 ? (
-                        mergedReviews.map(review => <ReviewCard key={review.id} review={review} />)
+                        mergedReviews.map(review => <ReviewCard key={review.id} review={review} currentUserId={profile?.id} />)
                     ) : (
                         <div className="text-center py-20">
                             <p className="text-blue-300 dark:text-yellow-600/30 font-black text-lg italic tracking-wide">Sin opiniones aún</p>
