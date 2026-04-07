@@ -61,10 +61,11 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, goBack }) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState<string | null>(null);
 
-  // Calcular total de reseñas del usuario
-  const userReviewsCount = React.useMemo(() => {
+  // Calcular total de reseñas del usuario y guardar cuáles son
+  const { userReviewsCount, matchedReviews } = React.useMemo(() => {
     let count = 0;
-    if (!allReviews || !profile?.id) return 0;
+    const matched: any[] = [];
+    if (!allReviews || !profile?.id) return { userReviewsCount: 0, matchedReviews: [] };
     
     console.log("DEBUG - Profile ID:", profile.id);
     
@@ -74,12 +75,13 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, goBack }) => {
           const isOwner = review.userId === profile.id;
           if (isOwner) {
             count++;
+            matched.push(review);
             console.log("DEBUG - Match found for review:", review.id, "with userId:", review.userId);
           }
         });
       }
     });
-    return count;
+    return { userReviewsCount: count, matchedReviews: matched };
   }, [allReviews, profile?.id]);
 
   const handleLogout = async () => {
@@ -148,6 +150,25 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, goBack }) => {
                         <p className="text-[10px] font-bold text-red-600 dark:text-red-400 uppercase">Cuenta Activa (Debug):</p>
                         <p className="text-xs font-black text-gray-700 dark:text-slate-300 lowercase">{profile?.email || 'Sin Email'}</p>
                         <p className="text-[8px] text-gray-400 font-mono mt-1 truncate">ID: {profile?.id || 'Sin ID'}</p>
+                        
+                        {matchedReviews.length > 0 && (
+                            <div className="mt-2 pt-2 border-t border-red-200 dark:border-red-800">
+                                <p className="text-[8px] font-bold text-red-500 uppercase">Reseñas detectadas:</p>
+                                {matchedReviews.map((r: any) => (
+                                    <p key={r.id} className="text-[7px] text-gray-500 font-mono truncate">Rev: {r.id} | User: {r.userId}</p>
+                                ))}
+                            </div>
+                        )}
+
+                        <button 
+                            onClick={() => {
+                                localStorage.clear();
+                                supabase.auth.signOut().then(() => window.location.reload());
+                            }}
+                            className="mt-3 w-full bg-red-600 text-white text-[10px] font-black py-2 rounded-md uppercase tracking-widest active:scale-95 transition-transform"
+                        >
+                            Limpieza Total y Reinicio
+                        </button>
                     </div>
                     <p className="text-blue-600 dark:text-yellow-400 text-xs font-black uppercase tracking-[0.2em] mt-3 bg-white/80 dark:bg-slate-800/80 px-4 py-2 rounded-full w-fit border border-white dark:border-slate-700 shadow-sm transition-colors duration-300">
                         {profile?.role === 'merchant' ? 'Comerciante Destacado' : 'Cliente Destacado'}

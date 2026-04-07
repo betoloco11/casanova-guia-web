@@ -44,7 +44,7 @@ const AppContent: React.FC = () => {
            (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
   });
 
-  const { favoriteIds, toggleFavorite, allReviews, addReview, profile, updateProfile } = useAppContext();
+  const { favoriteIds, toggleFavorite, allReviews, addReview, profile, updateProfile, refreshData } = useAppContext();
 
   useEffect(() => {
     const timeout = setTimeout(() => {

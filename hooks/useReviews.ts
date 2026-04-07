@@ -37,6 +37,8 @@ export const useReviews = () => {
             const dateObj = new Date(r.created_at);
             const dateStr = dateObj.toLocaleDateString('es-AR', { day: 'numeric', month: 'long' }).toUpperCase();
 
+            console.log("DEBUG - Loaded review from Supabase:", r.id, "for user:", r.user_id);
+
             formatted[r.business_id].push({
               id: r.id,
               userId: r.user_id,
