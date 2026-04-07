@@ -107,40 +107,61 @@ const HomePage: React.FC<HomePageProps> = ({
   return (
     <div className="space-y-10 transition-colors duration-300">
       <div className="px-4 pt-8">
-        <div className="flex justify-between items-center mb-4">
-          <div></div>
+        <div className="flex justify-between items-center mb-6">
+          <div className="flex items-center space-x-2">
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <span className="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest">En línea ahora</span>
+          </div>
           {session && (
             <button 
               onClick={() => navigateTo?.('profile')}
-              className="w-8 h-8 rounded-full bg-blue-600 dark:bg-yellow-400 flex items-center justify-center text-white dark:text-slate-950 font-black text-[10px]"
+              className="flex items-center space-x-2 bg-white dark:bg-slate-800 px-3 py-1.5 rounded-full border border-gray-100 dark:border-slate-700 shadow-sm active:scale-95 transition-all"
             >
-              {profile?.name?.charAt(0) || 'U'}
+              <span className="text-[10px] font-black text-gray-600 dark:text-slate-300 uppercase tracking-tight">{profile?.name?.split(' ')[0] || 'Usuario'}</span>
+              <div className="w-6 h-6 rounded-full bg-blue-600 dark:bg-yellow-400 flex items-center justify-center text-white dark:text-slate-950 font-black text-[10px]">
+                {profile?.name?.charAt(0) || 'U'}
+              </div>
             </button>
           )}
         </div>
-        {!session && !isSearching && (
-          <div className="mb-6 bg-slate-900 dark:bg-slate-900 rounded-[28px] p-6 shadow-xl overflow-hidden relative group border border-slate-800 text-center">
+
+        {!isSearching && (
+          <div className="mb-8 bg-slate-900 dark:bg-slate-900 rounded-[32px] p-8 shadow-2xl overflow-hidden relative group border border-slate-800 text-center">
             <div className="relative z-10 flex flex-col items-center">
-              <h3 className="text-white text-2xl font-medium tracking-tight leading-none mb-3">¡Hola, vecino! 👋</h3>
-              <p className="text-slate-400 text-[11px] font-black uppercase tracking-tight leading-tight mb-5 whitespace-nowrap">
-                CREA TU CUENTA GRATIS Y COMIENZA A SUMAR PUNTOS!
+              <h3 className="text-white text-2xl font-medium tracking-tight leading-none mb-3">
+                {session ? `¡Hola, ${profile?.name?.split(' ')[0] || 'vecino'}! 👋` : '¡Hola, vecino! 👋'}
+              </h3>
+              <p className="text-slate-400 text-[11px] font-black uppercase tracking-tight leading-tight mb-6">
+                {session ? '¡QUÉ BUENO VERTE DE NUEVO POR AQUÍ!' : 'CREA TU CUENTA GRATIS Y COMIENZA A SUMAR PUNTOS!'}
               </p>
-              <div className="flex space-x-3 w-full">
+              
+              {!session ? (
+                <div className="flex space-x-3 w-full">
+                  <button 
+                    onClick={() => navigateTo?.('register')}
+                    className="flex-1 bg-yellow-400 text-slate-950 font-black py-4 rounded-2xl text-[10px] uppercase tracking-[0.15em] shadow-lg active:scale-95 transition-all"
+                  >
+                    Crear Cuenta
+                  </button>
+                  <button 
+                    onClick={() => navigateTo?.('login')}
+                    className="flex-1 bg-white/10 text-white font-black py-4 rounded-2xl text-[10px] uppercase tracking-[0.15em] hover:bg-white/20 transition-all border border-white/10"
+                  >
+                    Ingresar
+                  </button>
+                </div>
+              ) : (
                 <button 
-                  onClick={() => navigateTo?.('register')}
-                  className="flex-1 bg-yellow-400 text-slate-950 font-black py-4 rounded-2xl text-[10px] uppercase tracking-[0.15em] shadow-lg active:scale-95 transition-all"
+                  onClick={() => navigateTo?.('profile')}
+                  className="w-full bg-blue-600 text-white font-black py-4 rounded-2xl text-[10px] uppercase tracking-[0.15em] shadow-lg active:scale-95 transition-all flex items-center justify-center space-x-2"
                 >
-                  Crear Cuenta
+                  <span>Ver mi actividad</span>
+                  <ChevronLeftIcon className="w-4 h-4 rotate-180" />
                 </button>
-                <button 
-                  onClick={() => navigateTo?.('login')}
-                  className="flex-1 bg-white/10 text-white font-black py-4 rounded-2xl text-[10px] uppercase tracking-[0.15em] hover:bg-white/20 transition-all border border-white/10"
-                >
-                  Ingresar
-                </button>
-              </div>
+              )}
             </div>
-            <UserCircleIcon className="absolute -bottom-6 -right-6 w-24 h-24 text-white opacity-5 pointer-events-none group-hover:scale-110 transition-transform duration-700" />
+            <UserCircleIcon className="absolute -bottom-8 -right-8 w-32 h-32 text-white opacity-5 pointer-events-none group-hover:scale-110 transition-transform duration-700" />
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-500/20 to-transparent"></div>
           </div>
         )}
         

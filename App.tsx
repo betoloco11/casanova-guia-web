@@ -249,7 +249,7 @@ const AppContent: React.FC = () => {
                   goBack={goBack}
                 />;
       case 'profile':
-        return <ProfilePage navigateTo={navigateTo} goBack={goBack} />;
+        return <ProfilePage navigateTo={navigateTo} goBack={goBack} isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />;
       case 'notifications':
         return <NotificationsPage goBack={goBack} />;
       case 'categoryResults':

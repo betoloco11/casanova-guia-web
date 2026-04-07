@@ -20,6 +20,8 @@ import Modal from '../components/Modal';
 interface ProfilePageProps {
     navigateTo: (page: Page) => void;
     goBack: () => void;
+    isDarkMode?: boolean;
+    toggleDarkMode?: () => void;
 }
 
 const MenuOption: React.FC<{
@@ -56,7 +58,7 @@ const SectionHeader: React.FC<{title: string, subtitle: string}> = ({title, subt
     </div>
 );
 
-const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, goBack }) => {
+const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, goBack, isDarkMode, toggleDarkMode }) => {
   const { profile, favoriteIds, allReviews, refreshData } = useAppContext();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState<string | null>(null);
@@ -81,8 +83,16 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, goBack }) => {
 
   const handleLogout = async () => {
     try {
-        // Limpiamos todo el cache local inmediatamente
+        // Preservamos el tema antes de limpiar
+        const currentTheme = localStorage.getItem('theme');
+        
+        // Limpiamos todo el cache local
         localStorage.clear();
+        
+        // Restauramos el tema
+        if (currentTheme) {
+            localStorage.setItem('theme', currentTheme);
+        }
         
         // Intentamos cerrar sesión en Supabase
         await supabase.auth.signOut();
@@ -232,6 +242,12 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, goBack }) => {
 
             <SectionHeader title="Herramientas" subtitle="Utilidades del sistema" />
             <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-[48px] overflow-hidden shadow-sm border border-white dark:border-slate-700 transition-colors duration-300">
+                <MenuOption 
+                    icon={isDarkMode ? <SunIcon className="text-yellow-400" /> : <MoonIcon className="text-blue-500" />} 
+                    label={isDarkMode ? "Modo Claro" : "Modo Oscuro"} 
+                    value={isDarkMode ? "Cambiar a fondo claro" : "Cambiar a fondo oscuro"} 
+                    onClick={toggleDarkMode} 
+                />
                 <MenuOption 
                     icon={<BadgeIcon className="text-blue-500 dark:text-yellow-400" />} 
                     label="Refrescar App" 
