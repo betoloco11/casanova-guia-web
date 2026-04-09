@@ -281,7 +281,11 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, goBack, isDarkMod
             <div className="mt-12 text-center pb-12">
                 <button 
                     onClick={() => {
+                        const currentTheme = localStorage.getItem('theme');
                         localStorage.clear();
+                        if (currentTheme) {
+                            localStorage.setItem('theme', currentTheme);
+                        }
                         window.location.href = window.location.href.split('?')[0] + '?v=' + new Date().getTime();
                     }}
                     className="text-[10px] font-black text-gray-400 dark:text-slate-600 uppercase tracking-[0.3em] hover:text-blue-500 transition-colors"
