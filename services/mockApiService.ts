@@ -771,14 +771,21 @@ export const getBusinesses = async (): Promise<Business[]> => {
   if (!isSupabaseConfigured()) return mockBusinesses;
   
   try {
-    const { data, error } = await supabase
+    // Timeout de 5 segundos para evitar bloqueos
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Timeout fetching businesses')), 5000)
+    );
+
+    const fetchPromise = supabase
       .from('businesses')
       .select('*');
+
+    const { data, error } = await Promise.race([fetchPromise, timeoutPromise]) as any;
     
     if (error) throw error;
     if (!data || data.length === 0) return mockBusinesses;
     
-    return data.map(b => ({
+    return data.map((b: any) => ({
       ...b,
       categoryId: b.category_id,
       reviewCount: b.review_count
@@ -793,15 +800,21 @@ export const getBusinessesByCategory = async (categoryId: string): Promise<Busin
   if (!isSupabaseConfigured()) return mockBusinesses.filter(b => b.categoryId === categoryId);
 
   try {
-    const { data, error } = await supabase
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Timeout fetching businesses by category')), 5000)
+    );
+
+    const fetchPromise = supabase
       .from('businesses')
       .select('*')
       .eq('category_id', categoryId);
+
+    const { data, error } = await Promise.race([fetchPromise, timeoutPromise]) as any;
     
     if (error) throw error;
     if (!data || data.length === 0) return mockBusinesses.filter(b => b.categoryId === categoryId);
     
-    return data.map(b => ({
+    return data.map((b: any) => ({
       ...b,
       categoryId: b.category_id,
       reviewCount: b.review_count
@@ -816,11 +829,17 @@ export const getBusinessById = async (id: string): Promise<Business | null> => {
   if (!isSupabaseConfigured()) return mockBusinesses.find(b => b.id === id) || null;
 
   try {
-    const { data, error } = await supabase
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Timeout fetching business by ID')), 5000)
+    );
+
+    const fetchPromise = supabase
       .from('businesses')
       .select('*')
       .eq('id', id)
       .single();
+
+    const { data, error } = await Promise.race([fetchPromise, timeoutPromise]) as any;
     
     if (error) throw error;
     return {
@@ -838,14 +857,20 @@ export const getPromotions = async (): Promise<Promotion[]> => {
   if (!isSupabaseConfigured()) return mockPromotions;
 
   try {
-    const { data, error } = await supabase
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Timeout fetching promotions')), 5000)
+    );
+
+    const fetchPromise = supabase
       .from('promotions')
       .select('*');
+
+    const { data, error } = await Promise.race([fetchPromise, timeoutPromise]) as any;
     
     if (error) throw error;
     if (!data || data.length === 0) return mockPromotions;
     
-    return data.map(p => ({
+    return data.map((p: any) => ({
       ...p,
       businessId: p.business_id,
       businessName: p.business_name,

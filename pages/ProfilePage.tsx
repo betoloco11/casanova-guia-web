@@ -11,7 +11,9 @@ import {
     ChatAltIcon, 
     BadgeIcon,
     ChevronLeftIcon,
-    TrashIcon
+    TrashIcon,
+    SunIcon,
+    MoonIcon
 } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
 import { supabase } from '../services/supabaseClient';

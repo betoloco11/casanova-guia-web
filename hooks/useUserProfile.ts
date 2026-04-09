@@ -51,11 +51,17 @@ export const useUserProfile = () => {
 
     if (isSupabaseConfigured()) {
       try {
-        const { data, error } = await supabase
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Timeout loading profile')), 5000)
+        );
+
+        const fetchPromise = supabase
           .from('profiles')
           .select('*')
           .eq('id', session.user.id)
           .single();
+
+        const { data, error } = await Promise.race([fetchPromise, timeoutPromise]) as any;
 
         if (error && error.code !== 'PGRST116') throw error;
 
