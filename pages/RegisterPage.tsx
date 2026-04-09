@@ -48,7 +48,8 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ navigateTo }) => {
                     data: {
                         full_name: name,
                         role: role
-                    }
+                    },
+                    emailRedirectTo: window.location.origin
                 }
             });
 
