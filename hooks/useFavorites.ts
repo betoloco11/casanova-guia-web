@@ -13,7 +13,6 @@ export const useFavorites = () => {
             const { data: { session } } = await supabase.auth.getSession();
             
             if (session && isSupabaseConfigured()) {
-                // Timeout de 5 segundos
                 const timeoutPromise = new Promise((_, reject) => 
                     setTimeout(() => reject(new Error('Timeout loading favorites')), 5000)
                 );
@@ -27,11 +26,42 @@ export const useFavorites = () => {
                 
                 if (error) throw error;
                 
-                const ids = new Set<string>(data.map((f: any) => f.business_id));
-                setFavoriteIds(ids);
-                localStorage.setItem(FAVORITES_KEY, JSON.stringify(Array.from(ids)));
+                if (data && data.length > 0) {
+                    // Caso ideal: Tenemos datos en la nube, los usamos
+                    const ids = new Set<string>(data.map((f: any) => f.business_id));
+                    setFavoriteIds(ids);
+                    localStorage.setItem(FAVORITES_KEY, JSON.stringify(Array.from(ids)));
+                    console.log("Favoritos cargados desde Supabase:", ids.size);
+                } else {
+                    // Caso crítico: Nube vacía. ¿Hay algo local previo que debamos migrar?
+                    const stored = localStorage.getItem(FAVORITES_KEY);
+                    if (stored) {
+                        try {
+                            const localIds = JSON.parse(stored) as string[];
+                            if (localIds.length > 0) {
+                                console.log("Detectados favoritos locales para migrar a nueva cuenta...");
+                                // Intentamos migrar a Supabase
+                                const inserts = localIds.map(id => ({
+                                    user_id: session.user.id,
+                                    business_id: id
+                                }));
+                                await supabase.from('favorites').insert(inserts);
+                                console.log("Migración exitosa a Supabase.");
+                                setFavoriteIds(new Set(localIds));
+                            } else {
+                                setFavoriteIds(new Set());
+                            }
+                        } catch (e) {
+                            console.error("Error migrando favoritos locales:", e);
+                            setFavoriteIds(new Set());
+                        }
+                    } else {
+                        // Realmente no tiene nada
+                        setFavoriteIds(new Set());
+                    }
+                }
             } else {
-                // Fallback to local storage for guest users
+                // Fallback normal para invitados
                 const stored = localStorage.getItem(FAVORITES_KEY);
                 if (stored) {
                     try {
@@ -44,8 +74,7 @@ export const useFavorites = () => {
                 }
             }
         } catch (error) {
-            console.error("Error loading favorites:", error);
-            // En caso de error, intentamos cargar de local storage como último recurso
+            console.error("Error crítico loading favorites:", error);
             const stored = localStorage.getItem(FAVORITES_KEY);
             if (stored) {
                 try {
@@ -68,68 +97,57 @@ export const useFavorites = () => {
     }, [loadFavorites]);
 
     const toggleFavorite = useCallback(async (businessId: string) => {
+        let shouldBeFavorite = false;
+        
+        // 1. Update LOCAL state immediately (Optimistic)
+        setFavoriteIds(prev => {
+            shouldBeFavorite = !prev.has(businessId);
+            const next = new Set(prev);
+            if (shouldBeFavorite) next.add(businessId);
+            else next.delete(businessId);
+            localStorage.setItem(FAVORITES_KEY, JSON.stringify(Array.from(next)));
+            console.log(`Favorito ${shouldBeFavorite ? 'añadido' : 'eliminado'} localmente:`, businessId);
+            return next;
+        });
+
+        // 2. Sync with Supabase (in background)
         try {
             const { data: { session } } = await supabase.auth.getSession();
             
             if (session && isSupabaseConfigured()) {
-                const timeoutPromise = new Promise((_, reject) => 
-                    setTimeout(() => reject(new Error('Timeout toggling favorite')), 5000)
-                );
-
-                if (favoriteIds.has(businessId)) {
-                    const deletePromise = supabase
+                if (!shouldBeFavorite) {
+                    // Si ya no es favorito, eliminar de Supabase
+                    const { error } = await supabase
                         .from('favorites')
                         .delete()
                         .eq('user_id', session.user.id)
                         .eq('business_id', businessId);
                     
-                    const { error } = await Promise.race([deletePromise, timeoutPromise]) as any;
                     if (error) throw error;
+                    console.log("Sincronizado: Eliminado de Supabase");
                 } else {
-                    const insertPromise = supabase
+                    // Si ahora es favorito, añadir a Supabase
+                    const { error } = await supabase
                         .from('favorites')
                         .insert([{
                             user_id: session.user.id,
                             business_id: businessId
                         }]);
                     
-                    const { error } = await Promise.race([insertPromise, timeoutPromise]) as any;
                     if (error) throw error;
+                    console.log("Sincronizado: Añadido a Supabase");
                 }
-                
-                // Actualizamos estado local inmediatamente para mejor UX
-                setFavoriteIds(prev => {
-                    const next = new Set(prev);
-                    if (next.has(businessId)) next.delete(businessId);
-                    else next.add(businessId);
-                    localStorage.setItem(FAVORITES_KEY, JSON.stringify(Array.from(next)));
-                    return next;
-                });
             } else {
-                // Local only for guest
-                setFavoriteIds(prevIds => {
-                    const newIds = new Set(prevIds);
-                    if (newIds.has(businessId)) {
-                        newIds.delete(businessId);
-                    } else {
-                        newIds.add(businessId);
-                    }
-                    localStorage.setItem(FAVORITES_KEY, JSON.stringify(Array.from(newIds)));
-                    return newIds;
-                });
+                console.log("No sincronizado: Sesión no disponible o Supabase no configurado");
+                if (!session) {
+                    console.warn("Usuario no autenticado, guardado solo local.");
+                }
             }
         } catch (error) {
-            console.error("Error toggling favorite:", error);
-            // Fallback local incluso si falla Supabase para que el usuario vea el cambio
-            setFavoriteIds(prev => {
-                const next = new Set(prev);
-                if (next.has(businessId)) next.delete(businessId);
-                else next.add(businessId);
-                localStorage.setItem(FAVORITES_KEY, JSON.stringify(Array.from(next)));
-                return next;
-            });
+            console.error("Error al sincronizar favorito con servidor:", error);
+            // El estado local se mantiene para no frustrar la navegación inmediata
         }
-    }, [favoriteIds]);
+    }, []); // Eliminamos dependencias para evitar cierres obsoletos y re-creaciones de función
 
     return { favoriteIds, toggleFavorite };
 };
