@@ -83,30 +83,37 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, goBack, isDarkMod
     return count;
   }, [allReviews, profile?.id]);
 
-  const handleLogout = async () => {
-    try {
-        // Preservamos el tema antes de limpiar
-        const currentTheme = localStorage.getItem('theme');
-        
-        // Limpiamos todo el cache local
-        localStorage.clear();
-        
-        // Restauramos el tema
-        if (currentTheme) {
-            localStorage.setItem('theme', currentTheme);
+    const handleLogout = async () => {
+        try {
+            console.log("Iniciando cierre de sesión...");
+            
+            // 1. Intentamos cerrar sesión en Supabase PRIMERO
+            // Esto es crucial para que Supabase pueda usar el token actual para invalidar la sesión
+            await supabase.auth.signOut();
+            console.log("Supabase signOut completado");
+            
+            // 2. Preservamos el tema antes de limpiar el resto
+            const currentTheme = localStorage.getItem('theme');
+            
+            // 3. Limpiamos el cache local
+            localStorage.clear();
+            
+            // 4. Restauramos el tema
+            if (currentTheme) {
+                localStorage.setItem('theme', currentTheme);
+            }
+        } catch (error) {
+            console.error("Error detallado al cerrar sesión:", error);
+            // Fallback agresivo: si Supabase falla, al menos limpiamos el local
+            const theme = localStorage.getItem('theme');
+            localStorage.clear();
+            if (theme) localStorage.setItem('theme', theme);
+        } finally {
+            console.log("Redirigiendo al inicio...");
+            // Usamos un método más directo para forzar el reinicio limpio de la app
+            window.location.assign('/');
         }
-        
-        // Intentamos cerrar sesión en Supabase
-        await supabase.auth.signOut();
-    } catch (error) {
-        console.error("Error al cerrar sesión:", error);
-    } finally {
-        // Siempre navegamos al home, incluso si hay error (sesión ya expirada o borrada)
-        navigateTo('home');
-        // Forzamos un refresh para limpiar cualquier estado residual en memoria
-        window.location.reload();
-    }
-  };
+    };
 
   const handleDeleteAccount = async () => {
     try {
@@ -281,11 +288,27 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, goBack, isDarkMod
             <div className="mt-12 text-center pb-12">
                 <button 
                     onClick={() => {
-                        const currentTheme = localStorage.getItem('theme');
+                        // 1. Identificar qué queremos conservar (Tema y Sesión de Supabase)
+                        const theme = localStorage.getItem('theme');
+                        
+                        // Buscamos todas las llaves de Supabase (empiezan con 'sb-')
+                        const supabaseKeys = Object.keys(localStorage).filter(key => key.startsWith('sb-'));
+                        const supabaseData: Record<string, string> = {};
+                        supabaseKeys.forEach(key => {
+                            const val = localStorage.getItem(key);
+                            if (val) supabaseData[key] = val;
+                        });
+
+                        // 2. Limpiar todo
                         localStorage.clear();
-                        if (currentTheme) {
-                            localStorage.setItem('theme', currentTheme);
-                        }
+
+                        // 3. Restaurar lo esencial
+                        if (theme) localStorage.setItem('theme', theme);
+                        Object.entries(supabaseData).forEach(([key, val]) => {
+                            localStorage.setItem(key, val);
+                        });
+
+                        // 4. Recargar
                         window.location.href = window.location.href.split('?')[0] + '?v=' + new Date().getTime();
                     }}
                     className="text-[10px] font-black text-gray-400 dark:text-slate-600 uppercase tracking-[0.3em] hover:text-blue-500 transition-colors"

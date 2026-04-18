@@ -20,18 +20,43 @@ const MetricCard: React.FC<{label: string; value: string | number; trend: string
 
 const OwnerDashboardPage: React.FC<{ goBack: () => void }> = ({ goBack }) => {
     const { profile } = useUserProfile();
-    const { allReviews } = useReviews();
+    const { allReviews, refreshReviews } = useReviews();
     const [isSeeding, setIsSeeding] = useState(false);
     const [seedMessage, setSeedMessage] = useState<string | null>(null);
     const [isAdmin, setIsAdmin] = useState(false);
     const [merchantBusinessId, setMerchantBusinessId] = useState<string | null>(null);
     const [favoritesCount, setFavoritesCount] = useState(0);
+    const [globalStats, setGlobalStats] = useState({ users: 0, reviews: 0, favorites: 0 });
+    const [allGlobalReviews, setAllGlobalReviews] = useState<any[]>([]);
 
     useEffect(() => {
         const checkAdminAndBusiness = async () => {
             const { data: { session } } = await supabase.auth.getSession();
             const userEmail = session?.user?.email;
-            setIsAdmin(userEmail === 'robertovizgarra@gmail.com');
+            const userIsAdmin = userEmail === 'robertovizgarra@gmail.com';
+            setIsAdmin(userIsAdmin);
+
+            if (userIsAdmin) {
+                // Si es admin, cargar estadísticas globales
+                const { count: userCount } = await supabase.from('profiles').select('*', { count: 'exact', head: true });
+                const { count: reviewCount } = await supabase.from('reviews').select('*', { count: 'exact', head: true });
+                const { count: favCount } = await supabase.from('favorites').select('*', { count: 'exact', head: true });
+                
+                // Cargar todas las reseñas con info del negocio
+                const { data: globalReviews } = await supabase
+                    .from('reviews')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(20);
+
+                setGlobalStats({ 
+                    users: userCount || 0, 
+                    reviews: reviewCount || 0, 
+                    favorites: favCount || 0 
+                });
+                
+                if (globalReviews) setAllGlobalReviews(globalReviews);
+            }
 
             if (userEmail) {
                 // Buscar si este usuario es dueño de algún comercio
@@ -56,6 +81,23 @@ const OwnerDashboardPage: React.FC<{ goBack: () => void }> = ({ goBack }) => {
         };
         checkAdminAndBusiness();
     }, []);
+
+    const deleteReview = async (id: string) => {
+        if (!confirm('¿Estás seguro de que quieres eliminar esta reseña? Esta acción no se puede deshacer.')) return;
+        
+        try {
+            const { error } = await supabase.from('reviews').delete().eq('id', id);
+            if (error) throw error;
+            
+            // Actualizar localmente
+            setAllGlobalReviews(prev => prev.filter(r => r.id !== id));
+            await refreshReviews();
+            alert('Reseña eliminada correctamente');
+        } catch (e) {
+            console.error(e);
+            alert('Error al eliminar la reseña');
+        }
+    };
 
     // Calcular reseñas reales para el comercio del mercante
     const businessReviewsCount = useMemo(() => {
@@ -101,28 +143,81 @@ const OwnerDashboardPage: React.FC<{ goBack: () => void }> = ({ goBack }) => {
 
             <div className="p-6 space-y-6">
                 {isAdmin && (
-                    <div className="bg-white dark:bg-slate-800 rounded-[32px] p-6 border border-white dark:border-slate-700 shadow-sm">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center space-x-4">
-                                <div className="p-3 bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-2xl">
-                                    <DatabaseIcon className="w-5 h-5" />
+                    <>
+                        <div className="bg-gradient-to-br from-purple-600 to-indigo-700 rounded-[32px] p-6 text-white shadow-xl shadow-purple-200 dark:shadow-none">
+                            <h3 className="font-black uppercase tracking-[0.2em] text-[10px] opacity-80 mb-6">Estadísticas Globales de la App</h3>
+                            <div className="grid grid-cols-3 gap-2 text-center">
+                                <div className="bg-white/10 backdrop-blur-md rounded-2xl py-4 border border-white/10">
+                                    <p className="text-xl font-black">{globalStats.users}</p>
+                                    <p className="text-[8px] font-bold uppercase tracking-wider opacity-70">Usuarios</p>
                                 </div>
-                                <div>
-                                    <p className="text-sm font-black text-gray-800 dark:text-slate-100">Panel de Administrador</p>
-                                    <p className="text-[10px] text-gray-400 dark:text-slate-500 font-bold uppercase tracking-tighter">
-                                        {seedMessage || 'Inicializa la base de datos con datos de prueba'}
-                                    </p>
+                                <div className="bg-white/10 backdrop-blur-md rounded-2xl py-4 border border-white/10">
+                                    <p className="text-xl font-black">{globalStats.reviews}</p>
+                                    <p className="text-[8px] font-bold uppercase tracking-wider opacity-70">Reseñas</p>
+                                </div>
+                                <div className="bg-white/10 backdrop-blur-md rounded-2xl py-4 border border-white/10">
+                                    <p className="text-xl font-black">{globalStats.favorites}</p>
+                                    <p className="text-[8px] font-bold uppercase tracking-wider opacity-70">Favoritos</p>
                                 </div>
                             </div>
-                            <button 
-                                onClick={handleSeed}
-                                disabled={isSeeding}
-                                className={`text-white text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl border dark:border-slate-700 transition-all ${isSeeding ? 'bg-gray-400 cursor-not-allowed' : 'bg-purple-600 hover:bg-purple-700 active:scale-95'}`}
-                            >
-                                {isSeeding ? 'Procesando...' : 'Seed Data'}
-                            </button>
                         </div>
-                    </div>
+
+                        <div className="bg-white dark:bg-slate-800 rounded-[32px] p-6 border border-white dark:border-slate-700 shadow-sm">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-4">
+                                    <div className="p-3 bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-2xl">
+                                        <DatabaseIcon className="w-5 h-5" />
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-black text-gray-800 dark:text-slate-100">Mantenimiento</p>
+                                        <p className="text-[10px] text-gray-400 dark:text-slate-500 font-bold uppercase tracking-tighter">
+                                            {seedMessage || 'Resetear y cargar datos de prueba (Mock Data)'}
+                                        </p>
+                                    </div>
+                                </div>
+                                <button 
+                                    onClick={handleSeed}
+                                    disabled={isSeeding}
+                                    className={`text-white text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl border dark:border-slate-700 transition-all ${isSeeding ? 'bg-gray-400 cursor-not-allowed' : 'bg-purple-600 hover:bg-purple-700 active:scale-95'}`}
+                                >
+                                    {isSeeding ? 'Procesando...' : 'Seed Data'}
+                                </button>
+                            </div>
+                        </div>
+
+                        <section>
+                            <h3 className="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-4 ml-1">Últimas Reseñas Globales</h3>
+                            <div className="space-y-3">
+                                {allGlobalReviews.length > 0 ? allGlobalReviews.map(r => (
+                                    <div key={r.id} className="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-gray-100 dark:border-slate-800 flex items-start space-x-3">
+                                        <img src={r.user_photo} className="w-10 h-10 rounded-xl object-cover" alt="" />
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex justify-between items-start">
+                                                <p className="text-xs font-black text-gray-800 dark:text-slate-200 truncate">{r.user_name}</p>
+                                                <div className="flex items-center text-yellow-500">
+                                                    <StarIcon className="w-3 h-3 fill-current" />
+                                                    <span className="text-[10px] font-bold ml-1">{r.rating}</span>
+                                                </div>
+                                            </div>
+                                            <p className="text-[10px] text-blue-600 dark:text-indigo-400 font-bold uppercase mt-0.5">Negocio ID: {r.business_id}</p>
+                                            <p className="text-[11px] text-gray-500 dark:text-slate-400 mt-2 line-clamp-2 italic leading-relaxed">"{r.comment}"</p>
+                                            <div className="flex justify-between items-center mt-3">
+                                                <span className="text-[9px] text-gray-300 dark:text-slate-600 font-bold uppercase">{new Date(r.created_at).toLocaleDateString()}</span>
+                                                <button 
+                                                    onClick={() => deleteReview(r.id)}
+                                                    className="text-[9px] font-black text-red-500 uppercase tracking-widest px-2 py-1 bg-red-50 dark:bg-red-900/20 rounded-lg hover:bg-red-100 transition-colors"
+                                                >
+                                                    Eliminar
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )) : (
+                                    <p className="text-center py-10 text-[10px] font-bold text-gray-400 dark:text-slate-600 uppercase tracking-widest">No hay reseñas recientes</p>
+                                )}
+                            </div>
+                        </section>
+                    </>
                 )}
 
                 <div className="bg-white dark:bg-slate-800 rounded-[32px] p-6 border border-white dark:border-slate-700 shadow-sm flex justify-between items-center">
