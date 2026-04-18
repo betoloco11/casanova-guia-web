@@ -3,8 +3,10 @@
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
-  --dark-mode: selector;
 }
+
+/* Forzar el uso de la clase .dark para los estilos oscuros en Tailwind 4 */
+@variant dark (&:where(.dark, .dark *));
 
 body {
   @apply bg-gray-100 dark:bg-slate-900 text-gray-900 dark:text-gray-100;

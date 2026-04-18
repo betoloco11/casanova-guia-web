@@ -40,8 +40,9 @@ const AppContent: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [mapResults, setMapResults] = useState<Business[]>(mockBusinesses);
   const [isDarkMode, setIsDarkMode] = useState(() => {
-    return localStorage.getItem('theme') === 'dark' || 
-           (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    const saved = localStorage.getItem('theme');
+    if (saved) return saved === 'dark';
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
   });
 
   const { favoriteIds, toggleFavorite, allReviews, addReview, profile, updateProfile, refreshData } = useAppContext();
