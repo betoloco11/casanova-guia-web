@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Page } from '../types';
-import { supabase } from '../services/supabaseClient';
+import { supabase, signInWithGoogle } from '../services/supabaseClient';
 import { ChevronLeftIcon } from '../components/Icons';
 
 interface RegisterPageProps {
@@ -21,16 +21,12 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ navigateTo }) => {
         setLoading(true);
         setError(null);
         try {
-            const { error: loginError } = await supabase.auth.signInWithOAuth({
-                provider: 'google',
-                options: {
-                    redirectTo: window.location.origin
-                }
-            });
-            if (loginError) throw loginError;
+            await signInWithGoogle();
+            // Al ser exitoso, onAuthStateChange en App.tsx detectará la sesión
+            // y navegará a Home. El hook useUserProfile creará el perfil si no existe.
         } catch (err: any) {
             console.error("Error en Google Login:", err);
-            setError("Error al conectar con Google. Asegúrate de permitir ventanas emergentes.");
+            setError(err.message || "Error al conectar con Google. Asegúrate de permitir ventanas emergentes.");
             setLoading(false);
         }
     };

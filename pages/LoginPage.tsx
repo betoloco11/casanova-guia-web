@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Page } from '../types';
-import { supabase, isSupabaseConfigured } from '../services/supabaseClient';
+import { supabase, isSupabaseConfigured, signInWithGoogle } from '../services/supabaseClient';
 import { LogoIcon, XIcon, InfoIcon } from '../components/Icons';
 
 interface LoginPageProps {
@@ -24,17 +24,11 @@ const LoginPage: React.FC<LoginPageProps> = ({ navigateTo }) => {
         setLoading(true);
         setError(null);
         try {
-            const { error: loginError } = await supabase.auth.signInWithOAuth({
-                provider: 'google',
-                options: {
-                    redirectTo: window.location.origin
-                }
-            });
-            if (loginError) throw loginError;
+            await signInWithGoogle();
             // El resto se maneja por el listener en App.tsx
         } catch (err: any) {
             console.error("Error en Google Login:", err);
-            setError("Error al conectar con Google. Asegúrate de permitir ventanas emergentes.");
+            setError(err.message || "Error al conectar con Google. Asegúrate de permitir ventanas emergentes.");
             setLoading(false);
         }
     };

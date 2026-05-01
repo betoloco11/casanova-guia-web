@@ -54,6 +54,34 @@ const AppContent: React.FC = () => {
       }
     }, 10000); // 10 seconds timeout
 
+    // Lógica para manejar el retorno del popup de OAuth
+    if (window.opener && window.opener !== window) {
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session) {
+          window.opener.postMessage({ type: 'OAUTH_AUTH_SUCCESS' }, '*');
+          window.close();
+        }
+      });
+    }
+
+    const handleMessage = (event: MessageEvent) => {
+      // Ignorar mensajes que no sean de nuestro origen
+      if (!event.origin.includes('run.app') && !event.origin.includes('localhost')) return;
+      
+      if (event.data?.type === 'OAUTH_AUTH_SUCCESS') {
+        supabase.auth.getSession().then(({ data: { session } }) => {
+          setSession(session);
+          if (session) {
+            refreshData();
+            // Si estábamos en login/register, ir a home
+            setActivePage('home');
+          }
+        });
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
@@ -75,6 +103,7 @@ const AppContent: React.FC = () => {
 
     return () => {
       subscription.unsubscribe();
+      window.removeEventListener('message', handleMessage);
       clearTimeout(timeout);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
