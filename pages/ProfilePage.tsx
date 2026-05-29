@@ -61,7 +61,7 @@ const SectionHeader: React.FC<{title: string, subtitle: string}> = ({title, subt
 );
 
 const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, goBack, isDarkMode, toggleDarkMode }) => {
-  const { profile, favoriteIds, allReviews, refreshData } = useAppContext();
+  const { profile, favoriteIds, allReviews } = useAppContext();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState<string | null>(null);
 
@@ -145,7 +145,6 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, goBack, isDarkMod
             <div className="flex-1">
                 <h1 className="text-2xl font-black text-gray-800 dark:text-slate-100 tracking-tight leading-none">Mi Perfil</h1>
             </div>
-            <span className="text-[10px] font-black text-blue-600 dark:text-yellow-400 bg-white dark:bg-slate-800 px-3 py-1 rounded-full border border-blue-100 dark:border-slate-700 shadow-sm uppercase tracking-widest">v2.4.1</span>
         </div>
 
         <div className="px-6 pt-10 pb-12 rounded-b-[60px] relative overflow-hidden bg-white/40 dark:bg-slate-800/20 border-b border-white dark:border-slate-800 transition-colors duration-300">
@@ -184,7 +183,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, goBack, isDarkMod
         </div>
 
         <div className="px-6 pb-12">
-            <SectionHeader title="Mi Actividad" subtitle="Tu participación en la comunidad" />
+            <SectionHeader title="Mi Cuenta" subtitle="Tus datos y personalización" />
             <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-[48px] overflow-hidden shadow-sm border border-white dark:border-slate-700 transition-colors duration-300">
                 <MenuOption 
                     icon={<UserCircleIcon />} 
@@ -192,6 +191,22 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, goBack, isDarkMod
                     value="Editar datos y foto" 
                     onClick={() => navigateTo('editProfile')} 
                 />
+                <MenuOption 
+                    icon={<ShieldIcon />} 
+                    label="Seguridad" 
+                    value="Contraseña y sesiones activas" 
+                    onClick={() => navigateTo('security')} 
+                />
+                <MenuOption 
+                    icon={isDarkMode ? <SunIcon className="text-yellow-400" /> : <MoonIcon className="text-blue-500" />} 
+                    label={isDarkMode ? "Modo Claro" : "Modo Oscuro"} 
+                    value={isDarkMode ? "Cambiar a fondo claro" : "Cambiar a fondo oscuro"} 
+                    onClick={toggleDarkMode} 
+                />
+            </div>
+
+            <SectionHeader title="Mi Actividad" subtitle="Tu participación en la comunidad" />
+            <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-[48px] overflow-hidden shadow-sm border border-white dark:border-slate-700 transition-colors duration-300">
                 <MenuOption 
                     icon={<StarIcon />} 
                     label="Mis Opiniones" 
@@ -204,35 +219,36 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, goBack, isDarkMod
                     value="Suma un nuevo lugar a la guía" 
                     onClick={() => navigateTo('suggestBusiness')} 
                 />
+                {profile?.role === 'merchant' && (
+                    <MenuOption 
+                        icon={<MapIcon className="text-blue-500 dark:text-yellow-400"/>} 
+                        label="Panel de Dueño" 
+                        value="Gestionar mi comercio y datos" 
+                        onClick={() => navigateTo('ownerDashboard')} 
+                    />
+                )}
             </div>
 
-            {profile?.role === 'merchant' && (
-                <>
-                    <SectionHeader title="Espacio Comerciantes" subtitle="Gestión de comercios" />
-                    <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-[48px] overflow-hidden shadow-sm border border-white dark:border-slate-700 transition-colors duration-300">
-                        <MenuOption 
-                            icon={<MapIcon className="text-blue-500 dark:text-yellow-400"/>} 
-                            label="Panel de Dueño" 
-                            value="Gestionar mi comercio y datos" 
-                            onClick={() => navigateTo('ownerDashboard')} 
-                        />
-                    </div>
-                </>
-            )}
-
-            <SectionHeader title="Soporte" subtitle="Ayuda y estado de la app" />
+            <SectionHeader title="Privacidad y Soporte" subtitle="Ayuda legal y soporte técnico" />
             <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-[48px] overflow-hidden shadow-sm border border-white dark:border-slate-700 transition-colors duration-300">
                 <MenuOption 
                     icon={<ChatAltIcon />} 
                     label="Centro de Ayuda" 
-                    value="Estado de conexión y soporte" 
+                    value="Preguntas frecuentes y soporte técnico" 
                     onClick={() => navigateTo('helpCenter')} 
                 />
                 <MenuOption 
                     icon={<ShieldIcon />} 
                     label="Acerca de" 
-                    value="Información legal y de la guía" 
+                    value="Información legal y privacidad" 
                     onClick={() => navigateTo('about')} 
+                />
+                <MenuOption 
+                    icon={<TrashIcon className="text-red-500" />} 
+                    label="Eliminar Perfil" 
+                    value="Borrar tus datos de la app de forma definitiva" 
+                    destructive 
+                    onClick={() => setShowDeleteModal(true)}
                 />
                 <MenuOption 
                     icon={<LogoutIcon />} 
@@ -240,81 +256,12 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, goBack, isDarkMod
                     destructive 
                     onClick={handleLogout}
                 />
-                <MenuOption 
-                    icon={<TrashIcon className="text-red-500" />} 
-                    label="Eliminar Perfil" 
-                    value="Borrar tus datos de la app" 
-                    destructive 
-                    onClick={() => setShowDeleteModal(true)}
-                />
             </div>
 
-            <SectionHeader title="Herramientas" subtitle="Utilidades del sistema" />
-            <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-[48px] overflow-hidden shadow-sm border border-white dark:border-slate-700 transition-colors duration-300">
-                <MenuOption 
-                    icon={isDarkMode ? <SunIcon className="text-yellow-400" /> : <MoonIcon className="text-blue-500" />} 
-                    label={isDarkMode ? "Modo Claro" : "Modo Oscuro"} 
-                    value={isDarkMode ? "Cambiar a fondo claro" : "Cambiar a fondo oscuro"} 
-                    onClick={toggleDarkMode} 
-                />
-                <MenuOption 
-                    icon={<BadgeIcon className="text-blue-500 dark:text-yellow-400" />} 
-                    label="Refrescar App" 
-                    value="Recargar la aplicación" 
-                    onClick={async () => {
-                        try {
-                            await refreshData();
-                        } catch {
-                            window.location.reload();
-                        }
-                    }} 
-                />
-                <MenuOption 
-                    icon={<StarIcon className="text-blue-500 dark:text-yellow-400" />} 
-                    label="Pantalla Completa" 
-                    value="Expandir visualización" 
-                    onClick={() => {
-                        if (!document.fullscreenElement) {
-                            document.documentElement.requestFullscreen();
-                        } else {
-                            if (document.exitFullscreen) {
-                                document.exitFullscreen();
-                            }
-                        }
-                    }} 
-                />
-            </div>
-
-            <div className="mt-12 text-center pb-12">
-                <button 
-                    onClick={() => {
-                        // 1. Identificar qué queremos conservar (Tema y Sesión de Supabase)
-                        const theme = localStorage.getItem('theme');
-                        
-                        // Buscamos todas las llaves de Supabase (empiezan con 'sb-')
-                        const supabaseKeys = Object.keys(localStorage).filter(key => key.startsWith('sb-'));
-                        const supabaseData: Record<string, string> = {};
-                        supabaseKeys.forEach(key => {
-                            const val = localStorage.getItem(key);
-                            if (val) supabaseData[key] = val;
-                        });
-
-                        // 2. Limpiar todo
-                        localStorage.clear();
-
-                        // 3. Restaurar lo esencial
-                        if (theme) localStorage.setItem('theme', theme);
-                        Object.entries(supabaseData).forEach(([key, val]) => {
-                            localStorage.setItem(key, val);
-                        });
-
-                        // 4. Recargar
-                        window.location.href = window.location.href.split('?')[0] + '?v=' + new Date().getTime();
-                    }}
-                    className="text-[10px] font-black text-gray-400 dark:text-slate-600 uppercase tracking-[0.3em] hover:text-blue-500 transition-colors"
-                >
-                    Casanova Guía Web v2.4.1 - Forzar Recarga Total
-                </button>
+            <div className="mt-16 text-center pb-12">
+                <p className="text-[10px] font-black text-gray-400 dark:text-slate-600 uppercase tracking-[0.3em] select-none">
+                    Casanova Guía Web • Hecha con Amor para todos los vecinos ❤️
+                </p>
             </div>
         </div>
 

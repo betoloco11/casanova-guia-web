@@ -66,7 +66,7 @@ const AppContent: React.FC = () => {
 
     const handleMessage = (event: MessageEvent) => {
       // Ignorar mensajes que no sean de nuestro origen
-      if (!event.origin.includes('run.app') && !event.origin.includes('localhost')) return;
+      if (event.origin !== window.location.origin) return;
       
       if (event.data?.type === 'OAUTH_AUTH_SUCCESS') {
         supabase.auth.getSession().then(({ data: { session } }) => {

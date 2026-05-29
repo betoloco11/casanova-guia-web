@@ -1,9 +1,9 @@
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { ChevronLeftIcon, MapIcon } from '../components/Icons';
 import SearchBar from '../components/SearchBar';
 import BusinessCard from '../components/BusinessCard';
-import { mockBusinesses } from '../services/mockApiService';
+import { getBusinesses } from '../services/mockApiService';
 import { useFavorites } from '../hooks/useFavorites';
 import { Page, Business } from '../types';
 import { CATEGORIES } from '../constants';
@@ -41,10 +41,22 @@ const SearchTag: React.FC<{text: string; active: boolean; onClick: () => void}> 
 const SearchPage: React.FC<SearchPageProps> = ({ goBack, viewBusinessDetails, onViewMap, viewWriteReview }) => {
   const [query, setQuery] = useState('');
   const [activeCategoryId, setActiveCategoryId] = useState<string | null>(null);
+  const [businesses, setBusinesses] = useState<Business[]>([]);
+  const [loading, setLoading] = useState(true);
   const { favoriteIds, toggleFavorite } = useFavorites();
 
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      const data = await getBusinesses();
+      setBusinesses(data);
+      setLoading(false);
+    };
+    fetchData();
+  }, []);
+
   const filteredResults = useMemo(() => {
-    let results = mockBusinesses;
+    let results = businesses;
     
     if (activeCategoryId) {
       results = results.filter(b => b.categoryId === activeCategoryId);
@@ -60,7 +72,7 @@ const SearchPage: React.FC<SearchPageProps> = ({ goBack, viewBusinessDetails, on
     }
     
     return results;
-  }, [query, activeCategoryId]);
+  }, [query, activeCategoryId, businesses]);
 
   const handleTagClick = (categoryId: string) => {
     if (activeCategoryId === categoryId) {
@@ -110,7 +122,18 @@ const SearchPage: React.FC<SearchPageProps> = ({ goBack, viewBusinessDetails, on
             </div>
             
             <div className="space-y-6">
-                {filteredResults.length > 0 ? (
+                {loading ? (
+                    [...Array(3)].map((_, i) => (
+                      <div key={i} className="animate-pulse flex space-x-4 p-4 bg-white dark:bg-slate-800 rounded-[32px] border border-blue-50 dark:border-slate-700">
+                        <div className="bg-gray-200 dark:bg-slate-700 h-24 w-24 rounded-2xl"></div>
+                        <div className="flex-1 space-y-3 py-1">
+                          <div className="h-5 bg-gray-200 dark:bg-slate-700 rounded w-3/4 animate-pulse"></div>
+                          <div className="h-5 bg-gray-200 dark:bg-slate-700 rounded w-1/2 animate-pulse"></div>
+                          <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-1/3 animate-pulse"></div>
+                        </div>
+                      </div>
+                    ))
+                ) : filteredResults.length > 0 ? (
                     <>
                         {filteredResults.map(business => (
                           <div key={business.id} className="bg-white dark:bg-slate-800 rounded-[32px] p-1 shadow-sm border border-blue-50 dark:border-slate-700 hover:shadow-md transition-shadow">

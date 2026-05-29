@@ -1,8 +1,8 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Page } from '../types';
-import { supabase, isSupabaseConfigured, signInWithGoogle } from '../services/supabaseClient';
-import { LogoIcon, XIcon, InfoIcon } from '../components/Icons';
+import { supabase, signInWithGoogle } from '../services/supabaseClient';
+import { LogoIcon, XIcon } from '../components/Icons';
 
 interface LoginPageProps {
     navigateTo: (page: Page) => void;
@@ -13,12 +13,6 @@ const LoginPage: React.FC<LoginPageProps> = ({ navigateTo }) => {
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [showStatus, setShowStatus] = useState(false);
-    const [isConnected, setIsConnected] = useState(isSupabaseConfigured());
-
-    useEffect(() => {
-        setIsConnected(isSupabaseConfigured());
-    }, []);
 
     const handleGoogleLogin = async () => {
         setLoading(true);
@@ -79,33 +73,6 @@ const LoginPage: React.FC<LoginPageProps> = ({ navigateTo }) => {
                         Casanova <span className="text-blue-600 dark:text-yellow-400">Guía</span>
                     </h1>
                     <p className="text-gray-500 dark:text-slate-400 font-bold uppercase text-[10px] tracking-[0.3em] mt-2">Acceso Clientes y Comerciantes</p>
-                    
-                    <button 
-                        onClick={() => setShowStatus(!showStatus)}
-                        className="mt-4 flex items-center space-x-2 text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-slate-600 hover:text-blue-500 transition-colors"
-                    >
-                        <InfoIcon className="w-3 h-3" />
-                        <span>Estado del Sistema</span>
-                    </button>
-
-                    {showStatus && (
-                        <div className="mt-2 p-3 bg-white dark:bg-slate-900 rounded-xl border border-gray-100 dark:border-slate-800 shadow-sm flex items-center space-x-3 animate-in fade-in slide-in-from-top-2 duration-300">
-                            <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' : 'bg-red-500 animate-pulse'}`}></div>
-                            <span className="text-[10px] font-bold text-gray-600 dark:text-slate-400 uppercase tracking-tight">
-                                {isConnected ? 'Conectado a Supabase' : 'Error de Configuración'}
-                            </span>
-                            {!isConnected && (
-                                <button 
-                                    onClick={() => {
-                                        setIsConnected(isSupabaseConfigured());
-                                    }}
-                                    className="text-[8px] bg-gray-100 dark:bg-slate-800 px-2 py-1 rounded-md font-black hover:bg-gray-200"
-                                >
-                                    REINTENTAR
-                                </button>
-                            )}
-                        </div>
-                    )}
                 </div>
 
                 <div className="mb-8">

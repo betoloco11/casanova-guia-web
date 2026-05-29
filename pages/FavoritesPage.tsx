@@ -1,9 +1,10 @@
 
-import React, { useMemo, useState } from 'react';
-import { mockBusinesses } from '../services/mockApiService';
+import React, { useMemo, useState, useEffect } from 'react';
+import { getBusinesses } from '../services/mockApiService';
 import BusinessCard from '../components/BusinessCard';
 import { HeartIcon, ArrowRightIcon, ChevronLeftIcon } from '../components/Icons';
 import { CATEGORIES } from '../constants';
+import { Business } from '../types';
 
 interface FavoritesPageProps {
   favoriteIds: Set<string>;
@@ -32,10 +33,27 @@ const FavoritesPage: React.FC<FavoritesPageProps> = ({
     goBack
 }) => {
     const [activeFilter, setActiveFilter] = useState<string>('all');
+    const [businesses, setBusinesses] = useState<Business[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchBiz = async () => {
+            setLoading(true);
+            try {
+                const data = await getBusinesses();
+                setBusinesses(data);
+            } catch (err) {
+                console.error("Error loading businesses in FavoritesPage", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchBiz();
+    }, []);
     
     const favoriteBusinesses = useMemo(() => 
-        mockBusinesses.filter(b => favoriteIds.has(b.id)),
-    [favoriteIds]);
+        businesses.filter(b => favoriteIds.has(b.id)),
+    [favoriteIds, businesses]);
 
     const filteredFavorites = useMemo(() => {
         if (activeFilter === 'all') return favoriteBusinesses;
@@ -43,8 +61,8 @@ const FavoritesPage: React.FC<FavoritesPageProps> = ({
     }, [favoriteBusinesses, activeFilter]);
 
     const suggestedBusinesses = useMemo(() => 
-        mockBusinesses.filter(b => !favoriteIds.has(b.id)).slice(0, 3),
-    [favoriteIds]);
+        businesses.filter(b => !favoriteIds.has(b.id)).slice(0, 3),
+    [favoriteIds, businesses]);
 
     const categoriesWithFavorites = useMemo(() => {
         const ids = new Set(favoriteBusinesses.map(b => b.categoryId));
@@ -52,8 +70,8 @@ const FavoritesPage: React.FC<FavoritesPageProps> = ({
     }, [favoriteBusinesses]);
 
     return (
-        <div className="min-h-screen transition-colors duration-300">
-            <div className="px-6 pt-10 pb-6 rounded-b-[40px] bg-[#FEF9C3]/90 dark:bg-slate-900/90 backdrop-blur-lg sticky top-0 z-20 border-b border-yellow-100 dark:border-slate-800 shadow-sm transition-colors duration-300">
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 transition-colors duration-300">
+            <div className="px-6 pt-10 pb-6 rounded-b-[40px] bg-[#FEF9C3]/90 dark:bg-slate-900/90 backdrop-blur-lg sticky top-0 z-20 border-b border-yellow-105 dark:border-slate-800 shadow-sm transition-colors duration-300">
                 <div className="flex items-center mb-4">
                     <button onClick={goBack} className="p-3 -ml-3 mr-2 text-gray-700 dark:text-slate-300 hover:bg-white/50 dark:hover:bg-slate-800 rounded-full transition-colors">
                         <ChevronLeftIcon className="w-7 h-7" />
@@ -61,7 +79,7 @@ const FavoritesPage: React.FC<FavoritesPageProps> = ({
                     <h1 className="text-3xl font-black text-gray-800 dark:text-slate-100 tracking-tighter">Mis Favoritos</h1>
                 </div>
 
-                {favoriteBusinesses.length > 0 && (
+                {!loading && favoriteBusinesses.length > 0 && (
                     <div className="flex space-x-2 overflow-x-auto no-scrollbar pb-1">
                         <FilterChip label="Todos" active={activeFilter === 'all'} onClick={() => setActiveFilter('all')} />
                         {categoriesWithFavorites.map(cat => (
@@ -77,7 +95,20 @@ const FavoritesPage: React.FC<FavoritesPageProps> = ({
             </div>
 
             <div className="px-4 py-6 pb-32">
-                {favoriteBusinesses.length > 0 ? (
+                {loading ? (
+                    <div className="space-y-4">
+                        {[...Array(3)].map((_, i) => (
+                            <div key={i} className="animate-pulse flex space-x-4 p-4 bg-white dark:bg-slate-800 rounded-[32px] border border-blue-50 dark:border-slate-700">
+                                <div className="bg-gray-200 dark:bg-slate-700 h-24 w-24 rounded-2xl"></div>
+                                <div className="flex-1 space-y-3 py-1">
+                                    <div className="h-5 bg-gray-200 dark:bg-slate-700 rounded w-3/4 animate-pulse"></div>
+                                    <div className="h-5 bg-gray-200 dark:bg-slate-700 rounded w-1/2 animate-pulse"></div>
+                                    <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-1/3 animate-pulse"></div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                ) : favoriteBusinesses.length > 0 ? (
                     <div className="space-y-4">
                         {filteredFavorites.length > 0 ? (
                             filteredFavorites.map(business => (
