@@ -26,9 +26,38 @@ export const useFavorites = () => {
                 
                 if (error) throw error;
                 
-                if (data && data.length > 0) {
+                let favoritesData = data;
+                
+                // Si la consulta inicial no devolvió nada, intentamos buscar si hay favoritos en una cuenta hermana con el mismo email
+                if ((!favoritesData || favoritesData.length === 0) && session.user.email) {
+                    console.log("[AutoSync Favorites] Buscando favoritos de cuenta hermana para el email:", session.user.email);
+                    try {
+                        const { data: siblingProfile } = await supabase
+                            .from('profiles')
+                            .select('id')
+                            .eq('email', session.user.email)
+                            .limit(1)
+                            .maybeSingle();
+
+                        if (siblingProfile && siblingProfile.id !== session.user.id) {
+                            const { data: fallbackFavorites } = await supabase
+                                .from('favorites')
+                                .select('business_id')
+                                .eq('user_id', siblingProfile.id);
+
+                            if (fallbackFavorites && fallbackFavorites.length > 0) {
+                                favoritesData = fallbackFavorites;
+                                console.log("[AutoSync Favorites] ¡Favoritos recuperados de cuenta hermana!", fallbackFavorites.length);
+                            }
+                        }
+                    } catch (siblingErr) {
+                        console.error("[AutoSync Favorites] Error al buscar favoritos de cuenta hermana:", siblingErr);
+                    }
+                }
+                
+                if (favoritesData && favoritesData.length > 0) {
                     // Caso ideal: Tenemos datos en la nube, los usamos
-                    const ids = new Set<string>(data.map((f: any) => f.business_id));
+                    const ids = new Set<string>(favoritesData.map((f: any) => f.business_id));
                     setFavoriteIds(ids);
                     localStorage.setItem(FAVORITES_KEY, JSON.stringify(Array.from(ids)));
                     console.log("Favoritos cargados desde Supabase:", ids.size);
