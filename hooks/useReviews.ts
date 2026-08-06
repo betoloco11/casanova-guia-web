@@ -53,7 +53,7 @@ export const useReviews = () => {
           localStorage.setItem(REVIEWS_KEY, JSON.stringify(formatted));
         }
       } catch (error) {
-        console.error("Error loading reviews from Supabase:", error);
+        console.warn("Notice: Could not load reviews from Supabase, using local fallback:", error);
       }
     }
   }, []);

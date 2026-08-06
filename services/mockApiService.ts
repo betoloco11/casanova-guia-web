@@ -791,7 +791,7 @@ export const getBusinesses = async (): Promise<Business[]> => {
       reviewCount: b.review_count
     })) as Business[];
   } catch (error) {
-    console.error("Error fetching businesses from Supabase:", error);
+    console.warn("Notice: Could not fetch businesses from Supabase, using mock fallback:", error);
     return mockBusinesses;
   }
 };
@@ -820,7 +820,7 @@ export const getBusinessesByCategory = async (categoryId: string): Promise<Busin
       reviewCount: b.review_count
     })) as Business[];
   } catch (error) {
-    console.error("Error fetching businesses by category from Supabase:", error);
+    console.warn("Notice: Could not fetch businesses by category from Supabase, using mock fallback:", error);
     return mockBusinesses.filter(b => b.categoryId === categoryId);
   }
 };
@@ -848,7 +848,7 @@ export const getBusinessById = async (id: string): Promise<Business | null> => {
       reviewCount: data.review_count
     } as Business;
   } catch (error) {
-    console.error("Error fetching business by ID from Supabase:", error);
+    console.warn("Notice: Could not fetch business by ID from Supabase, using mock fallback:", error);
     return mockBusinesses.find(b => b.id === id) || null;
   }
 };
@@ -878,7 +878,7 @@ export const getPromotions = async (): Promise<Promotion[]> => {
       businessLogo: p.business_logo
     })) as Promotion[];
   } catch (error) {
-    console.error("Error fetching promotions from Supabase:", error);
+    console.warn("Notice: Could not fetch promotions from Supabase, using mock fallback:", error);
     return mockPromotions;
   }
 };

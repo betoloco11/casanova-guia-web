@@ -173,6 +173,32 @@ const HomePage: React.FC<HomePageProps> = ({
         />
       </div>
 
+      {/* Banner de Captación y Mapeo Colectivo */}
+      <div className="px-4">
+        <div 
+          onClick={() => navigateTo?.('suggestBusiness')}
+          className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 dark:from-slate-800 dark:via-indigo-950 dark:to-slate-900 p-6 rounded-[32px] shadow-xl text-white relative overflow-hidden cursor-pointer group active:scale-[0.98] transition-all border border-blue-400/30 dark:border-indigo-500/30"
+        >
+          <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="space-y-1.5 flex-1">
+              <div className="inline-flex items-center space-x-2 bg-yellow-400/20 text-yellow-300 dark:text-yellow-400 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border border-yellow-400/30">
+                <span>📍 Mapeo de Isidro Casanova</span>
+              </div>
+              <h3 className="text-xl font-black leading-tight tracking-tight text-white">
+                ¡Estamos mapeando Isidro Casanova!
+              </h3>
+              <p className="text-xs text-blue-100 dark:text-slate-300 font-medium leading-relaxed">
+                Si tenés un comercio o querés recomendar tu lugar favorito, sumalo gratis aquí.
+              </p>
+            </div>
+            <div className="bg-yellow-400 text-slate-950 font-black text-xs uppercase tracking-wider px-5 py-3 rounded-2xl flex items-center space-x-2 shadow-md group-hover:bg-yellow-300 transition-colors shrink-0">
+              <span>Sumar Comercio</span>
+              <ChevronLeftIcon className="w-4 h-4 rotate-180" />
+            </div>
+          </div>
+        </div>
+      </div>
+
       {!isSearching && (
         <>
           <section>
