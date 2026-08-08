@@ -83,6 +83,22 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, goBack, isDarkMod
     return count;
   }, [allReviews, profile?.id]);
 
+  // Dynamic calculation of user points based on welcome bonus, reviews and favorites
+  const userPoints = React.useMemo(() => {
+    const dbPoints = profile?.points || 0;
+    const computed = 10 + (userReviewsCount * 15) + ((favoriteIds?.size || 0) * 5);
+    return Math.max(dbPoints, computed);
+  }, [profile?.points, userReviewsCount, favoriteIds?.size]);
+
+  const getDisplayFullName = () => {
+    if (!profile?.name) return profile?.role === 'merchant' ? 'Comerciante de Casanova' : 'Vecino de Casanova';
+    const raw = profile.name.trim();
+    if (raw === 'Cliente de Casanova' || raw === 'Cliente') {
+      return profile?.role === 'merchant' ? 'Comerciante de Casanova' : 'Vecino de Casanova';
+    }
+    return raw;
+  };
+
     const handleLogout = async () => {
         try {
             console.log("Iniciando cierre de sesión...");
@@ -157,11 +173,11 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, goBack, isDarkMod
                 </div>
                 <div>
                     <h2 className="text-3xl font-black text-gray-800 dark:text-slate-100 tracking-tighter leading-none">
-                        {profile?.name === 'Cliente de Casanova' && profile?.role === 'merchant' ? 'Comerciante de Casanova' : (profile?.name || 'Cargando...')}
+                        {getDisplayFullName()}
                     </h2>
                     <p className="text-xs font-bold text-gray-400 dark:text-slate-500 mt-1 lowercase">{profile?.email}</p>
                     <p className="text-blue-600 dark:text-yellow-400 text-xs font-black uppercase tracking-[0.2em] mt-3 bg-white/80 dark:bg-slate-800/80 px-4 py-2 rounded-full w-fit border border-white dark:border-slate-700 shadow-sm transition-colors duration-300">
-                        {profile?.role === 'merchant' ? 'Comerciante Destacado' : 'Cliente Destacado'}
+                        {profile?.role === 'merchant' ? 'Comerciante Destacado' : 'Vecino Destacado'}
                     </p>
                 </div>
             </div>
@@ -176,7 +192,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, goBack, isDarkMod
                     <p className="text-xs font-black text-gray-400 dark:text-slate-500 uppercase mt-2 tracking-widest">Reseñas</p>
                 </div>
                 <div className="text-center">
-                    <p className="text-2xl font-black text-gray-800 dark:text-slate-100 leading-none">{profile?.points || 0}</p>
+                    <p className="text-2xl font-black text-gray-800 dark:text-slate-100 leading-none">{userPoints}</p>
                     <p className="text-xs font-black text-gray-400 dark:text-slate-500 uppercase mt-2 tracking-widest">Puntos</p>
                 </div>
             </div>

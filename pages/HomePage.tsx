@@ -98,6 +98,21 @@ const HomePage: React.FC<HomePageProps> = ({
     );
   }, [searchQuery, businesses]);
 
+  const getGreetingName = () => {
+    if (!profile?.name) return 'Vecino';
+    const raw = profile.name.trim();
+    if (raw === 'Cliente de Casanova' || raw === 'Cliente') {
+      return profile?.role === 'merchant' ? 'Comerciante' : 'Vecino';
+    }
+    if (raw === 'Vecino de Casanova') return 'Vecino';
+    if (raw === 'Comerciante de Casanova') return 'Comerciante';
+    const firstWord = raw.split(' ')[0];
+    if (firstWord.toLowerCase() === 'cliente') {
+      return profile?.role === 'merchant' ? 'Comerciante' : 'Vecino';
+    }
+    return firstWord;
+  };
+
   const isSearching = searchQuery.length > 0;
 
   const scrollToTop = () => {
@@ -117,9 +132,9 @@ const HomePage: React.FC<HomePageProps> = ({
               onClick={() => navigateTo?.('profile')}
               className="flex items-center space-x-2 bg-white dark:bg-slate-800 px-3 py-1.5 rounded-full border border-gray-100 dark:border-slate-700 shadow-sm active:scale-95 transition-all"
             >
-              <span className="text-[10px] font-black text-gray-600 dark:text-slate-300 uppercase tracking-tight">{profile?.name?.split(' ')[0] || 'Usuario'}</span>
+              <span className="text-[10px] font-black text-gray-600 dark:text-slate-300 uppercase tracking-tight">{getGreetingName()}</span>
               <div className="w-6 h-6 rounded-full bg-blue-600 dark:bg-yellow-400 flex items-center justify-center text-white dark:text-slate-950 font-black text-[10px]">
-                {profile?.name?.charAt(0) || 'U'}
+                {getGreetingName().charAt(0)}
               </div>
             </button>
           )}
@@ -129,7 +144,7 @@ const HomePage: React.FC<HomePageProps> = ({
           <div className="mb-8 bg-slate-900 dark:bg-slate-900 rounded-[32px] p-8 shadow-2xl overflow-hidden relative group border border-slate-800 text-center">
             <div className="relative z-10 flex flex-col items-center">
               <h3 className="text-white text-2xl font-medium tracking-tight leading-none mb-3">
-                {session ? `¡Hola, ${profile?.name?.split(' ')[0] || 'vecino'}! 👋` : '¡Hola, vecino! 👋'}
+                {session ? `¡Hola, ${getGreetingName()}! 👋` : '¡Hola, vecino! 👋'}
               </h3>
               <p className="text-slate-400 text-[11px] font-black uppercase tracking-tight leading-tight mb-6">
                 {session ? '¡QUÉ BUENO VERTE DE NUEVO POR AQUÍ!' : 'CREA TU CUENTA GRATIS Y COMIENZA A SUMAR PUNTOS!'}

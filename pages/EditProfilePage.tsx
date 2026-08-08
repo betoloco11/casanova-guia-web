@@ -15,7 +15,11 @@ const EditProfilePage: React.FC<EditProfilePageProps> = ({ goBack }) => {
     const [role, setRole] = useState(profile?.role || 'client');
 
     const handleSave = async () => {
-        await updateProfile({ name, email, role });
+        let finalName = name.trim();
+        if (!finalName || finalName === 'Cliente' || finalName === 'Cliente de Casanova') {
+            finalName = role === 'merchant' ? 'Comerciante de Casanova' : 'Vecino de Casanova';
+        }
+        await updateProfile({ name: finalName, email, role });
         goBack();
     };
 
@@ -56,7 +60,7 @@ const EditProfilePage: React.FC<EditProfilePageProps> = ({ goBack }) => {
                                 onClick={() => setRole('client')}
                                 className={`py-4 rounded-2xl font-black text-xs uppercase tracking-widest border transition-all ${role === 'client' ? 'bg-blue-600 dark:bg-yellow-400 text-white dark:text-slate-950 border-blue-600 dark:border-yellow-400 shadow-lg' : 'bg-white dark:bg-slate-800 text-gray-400 dark:text-slate-500 border-gray-100 dark:border-slate-700'}`}
                             >
-                                Cliente
+                                Vecino
                             </button>
                             <button 
                                 onClick={() => setRole('merchant')}

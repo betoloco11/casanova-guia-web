@@ -126,21 +126,23 @@ const BusinessDetailPage: React.FC<BusinessDetailPageProps> = ({ business, goBac
         <div className="mt-8 space-y-8">
             <section>
                 <div className="px-3 mb-2">
-                    <h3 className="text-2xl font-black text-gray-800 dark:text-slate-100 tracking-tight">Ubicación</h3>
+                    <h3 className="text-2xl font-black text-gray-800 dark:text-slate-100 tracking-tight">Ubicación y Cobertura</h3>
                 </div>
                 
                 <div onClick={() => handleOpenDirections()} className="relative rounded-[40px] overflow-hidden cursor-pointer shadow-inner border border-white dark:border-slate-800 bg-blue-100/40 dark:bg-slate-900/40 p-3 group">
                     <div className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm p-6 rounded-[32px] border border-white dark:border-slate-700 shadow-xl group-hover:scale-[1.02] transition-all duration-300 flex items-center justify-between">
                         <div className="flex-1 min-w-0 pr-4">
-                            <p className="text-xs font-black text-blue-400 dark:text-yellow-400 uppercase mb-1 tracking-widest">Dirección</p>
-                            <p className="text-lg font-bold text-gray-800 dark:text-slate-200 leading-tight">{business.address}</p>
-                            <p className="text-xs text-blue-500 dark:text-yellow-400 font-bold mt-2 uppercase italic tracking-wide truncate">{business.landmarks}</p>
+                            <p className="text-xs font-black text-blue-400 dark:text-yellow-400 uppercase mb-1 tracking-widest">
+                                {business.address?.toLowerCase().includes('domicilio') || business.address?.toLowerCase().includes('cobertura') || business.address?.toLowerCase().includes('online') ? 'Zona de Atención' : 'Dirección'}
+                            </p>
+                            <p className="text-lg font-bold text-gray-800 dark:text-slate-200 leading-tight">{business.address || 'Isidro Casanova (A Domicilio / Consultar)'}</p>
+                            {business.landmarks && <p className="text-xs text-blue-500 dark:text-yellow-400 font-bold mt-2 uppercase italic tracking-wide truncate">{business.landmarks}</p>}
                         </div>
                         <button 
                             onClick={(e) => handleOpenDirections(e)}
                             className="flex flex-col items-center justify-center bg-blue-600 dark:bg-yellow-400 text-white dark:text-slate-950 px-5 py-4 rounded-3xl shadow-lg shadow-blue-200 dark:shadow-slate-900 active:scale-95 transition-all"
                         >
-                            <span className="text-[10px] font-black uppercase tracking-widest mb-1">Ruta</span>
+                            <span className="text-[10px] font-black uppercase tracking-widest mb-1">Mapa</span>
                             <NavigationIcon className="w-7 h-7" />
                         </button>
                     </div>
@@ -152,9 +154,12 @@ const BusinessDetailPage: React.FC<BusinessDetailPageProps> = ({ business, goBac
                   <h3 className="text-2xl font-black text-gray-800 dark:text-slate-100 tracking-tight">Contacto y Horarios</h3>
                 </div>
                 <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-[40px] p-8 border border-white dark:border-slate-700 shadow-sm transition-colors duration-300">
-                    <InfoRow label="Llamar al comercio" value={business.phone} onClick={handleCall} />
-                    {business.whatsapp && <InfoRow label="Enviar WhatsApp" value="Chatea con nosotros" onClick={handleWhatsApp} />}
-                    <InfoRow label="Horario de atención" value={business.hours} />
+                    {business.phone && <InfoRow label="Llamar al comercio" value={business.phone} onClick={handleCall} />}
+                    {business.whatsapp && <InfoRow label="Enviar WhatsApp" value="Chatea directamente" onClick={handleWhatsApp} />}
+                    {business.hours && <InfoRow label="Horario de atención" value={business.hours} />}
+                    {!business.phone && !business.whatsapp && (
+                        <p className="text-xs text-gray-500 dark:text-slate-400 font-medium italic">Contacto a través de atención presencial o redes sociales.</p>
+                    )}
                 </div>
             </section>
 

@@ -36,13 +36,15 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ navigateTo }) => {
         setLoading(true);
         setError(null);
 
+        const defaultName = name.trim() || (role === 'merchant' ? 'Comerciante de Casanova' : 'Vecino de Casanova');
+
         try {
             const { data, error: signUpError } = await supabase.auth.signUp({
                 email,
                 password,
                 options: {
                     data: {
-                        full_name: name,
+                        full_name: defaultName,
                         role: role
                     },
                     emailRedirectTo: window.location.origin
@@ -59,7 +61,7 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ navigateTo }) => {
                     .upsert({
                         id: data.user.id,
                         email: email,
-                        name: name,
+                        name: defaultName,
                         role: role,
                         points: 100,
                         neighborhood: 'Isidro Casanova'
@@ -175,7 +177,7 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ navigateTo }) => {
                                         onClick={() => setRole('client')}
                                         className={`py-4 rounded-2xl font-black text-xs uppercase tracking-widest border transition-all ${role === 'client' ? 'bg-blue-600 dark:bg-yellow-400 text-white dark:text-slate-950 border-blue-600 dark:border-yellow-400 shadow-lg' : 'bg-white dark:bg-slate-800 text-gray-400 dark:text-slate-500 border-gray-100 dark:border-slate-800'}`}
                                     >
-                                        Cliente
+                                        Vecino
                                     </button>
                                     <button 
                                         type="button"

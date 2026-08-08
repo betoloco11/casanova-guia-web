@@ -15,11 +15,11 @@ interface UserProfile {
 }
 
 const DEFAULT_PROFILE: UserProfile = {
-  name: 'Cliente de Casanova',
+  name: 'Vecino de Casanova',
   email: '',
   neighborhood: 'Isidro Casanova',
   role: 'client',
-  points: 0
+  points: 10
 };
 
 export const useUserProfile = () => {
@@ -96,12 +96,12 @@ export const useUserProfile = () => {
             // Creamos un nuevo perfil heredando todos los datos (nombre, puntos, rol, etc.) de la cuenta anterior
             const inheritedProfile: UserProfile = {
               id: session.user.id,
-              name: profileByEmail.name || session.user.user_metadata?.full_name || session.user.user_metadata?.name || 'Cliente de Casanova',
+              name: profileByEmail.name || session.user.user_metadata?.full_name || session.user.user_metadata?.name || (profileByEmail.role === 'merchant' ? 'Comerciante de Casanova' : 'Vecino de Casanova'),
               email: session.user.email,
               neighborhood: profileByEmail.neighborhood || 'Isidro Casanova',
               role: profileByEmail.role || 'client',
               business_id: profileByEmail.business_id,
-              points: profileByEmail.points || 0
+              points: profileByEmail.points || 10
             };
 
             // Guardamos el perfil en Supabase bajo el nuevo ID de la sesión de Google
@@ -161,7 +161,7 @@ export const useUserProfile = () => {
           const initialProfile: UserProfile = {
             ...DEFAULT_PROFILE,
             id: session.user.id,
-            name: session.user.user_metadata?.full_name || session.user.user_metadata?.name || (userRole === 'merchant' ? 'Comerciante de Casanova' : 'Cliente de Casanova'),
+            name: session.user.user_metadata?.full_name || session.user.user_metadata?.name || (userRole === 'merchant' ? 'Comerciante de Casanova' : 'Vecino de Casanova'),
             email: session.user.email || '',
             role: userRole
           };
