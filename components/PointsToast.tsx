@@ -31,9 +31,9 @@ export const PointsToast: React.FC<PointsToastProps> = ({ toast, onClose }) => {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -40, scale: 0.9 }}
           transition={{ type: 'spring', stiffness: 450, damping: 25 }}
-          className="fixed top-5 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-sm pointer-events-auto"
+          className="fixed top-5 left-1/2 -translate-x-1/2 z-[9999] w-[92%] max-w-sm pointer-events-auto"
         >
-          <div className="bg-slate-900/95 dark:bg-slate-900/95 text-white p-4 rounded-[28px] border-2 border-yellow-400 shadow-2xl shadow-yellow-500/25 flex items-center space-x-3.5 backdrop-blur-md">
+          <div className="bg-slate-900/95 dark:bg-slate-900/95 text-white p-4 rounded-[28px] border-2 border-yellow-400 shadow-2xl shadow-yellow-500/30 flex items-center space-x-3.5 backdrop-blur-md">
             <div className="w-12 h-12 bg-gradient-to-tr from-yellow-400 to-amber-300 text-slate-950 rounded-2xl flex items-center justify-center font-black text-lg shadow-md shrink-0 animate-bounce">
               +{toast.points}
             </div>
@@ -42,7 +42,7 @@ export const PointsToast: React.FC<PointsToastProps> = ({ toast, onClose }) => {
                 <span className="text-yellow-400 font-black text-[11px] uppercase tracking-widest">¡Puntos Sumados!</span>
                 <span className="text-sm">🎉</span>
               </div>
-              <p className="text-sm font-extrabold text-slate-100 leading-snug mt-0.5 truncate">
+              <p className="text-xs font-extrabold text-slate-100 leading-snug mt-0.5">
                 {toast.message}
               </p>
             </div>

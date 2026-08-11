@@ -195,26 +195,40 @@ export const useUserProfile = () => {
   }, [loadProfile]);
 
   const updateProfile = useCallback(async (newData: Partial<UserProfile>) => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) return;
+    let currentUserId = profile.id;
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user?.id) {
+        currentUserId = session.user.id;
+      }
+    } catch (e) {
+      console.warn("No se pudo obtener sesión para updateProfile:", e);
+    }
 
-    // Actualización local
-    const updatedProfile = { ...profile, ...newData };
+    // 1. Actualización local inmediata
+    const updatedProfile: UserProfile = { ...profile, ...newData, ...(currentUserId ? { id: currentUserId } : {}) };
     setProfile(updatedProfile);
     localStorage.setItem(USER_PROFILE_KEY, JSON.stringify(updatedProfile));
 
-    // Guardar en Supabase
-    if (isSupabaseConfigured()) {
-      try {
-        const { error } = await supabase
-          .from('profiles')
-          .upsert({ id: session.user.id, ...updatedProfile });
-        if (error) throw error;
-        setIsSynced(true);
-      } catch (error: any) {
-        console.error("Error updating profile in Supabase:", error);
-        setIsSynced(false);
-      }
+    // 2. Sincronizar con Supabase en segundo plano
+    if (isSupabaseConfigured() && currentUserId) {
+      (async () => {
+        try {
+          const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Timeout updating profile')), 3000)
+          );
+
+          const upsertPromise = supabase
+            .from('profiles')
+            .upsert({ id: currentUserId, ...updatedProfile });
+
+          await Promise.race([upsertPromise, timeoutPromise]);
+          setIsSynced(true);
+        } catch (error: any) {
+          console.warn("Error o timeout actualizando perfil en Supabase (guardado localmente):", error);
+          setIsSynced(false);
+        }
+      })();
     }
   }, [profile]);
 

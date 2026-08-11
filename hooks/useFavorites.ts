@@ -139,43 +139,38 @@ export const useFavorites = () => {
             return next;
         });
 
-        // 2. Sync with Supabase (in background)
-        try {
-            const { data: { session } } = await supabase.auth.getSession();
-            
-            if (session && isSupabaseConfigured()) {
-                if (!shouldBeFavorite) {
-                    // Si ya no es favorito, eliminar de Supabase
-                    const { error } = await supabase
-                        .from('favorites')
-                        .delete()
-                        .eq('user_id', session.user.id)
-                        .eq('business_id', businessId);
-                    
-                    if (error) throw error;
-                    console.log("Sincronizado: Eliminado de Supabase");
-                } else {
-                    // Si ahora es favorito, añadir a Supabase
-                    const { error } = await supabase
-                        .from('favorites')
-                        .insert([{
-                            user_id: session.user.id,
-                            business_id: businessId
-                        }]);
-                    
-                    if (error) throw error;
-                    console.log("Sincronizado: Añadido a Supabase");
+        // 2. Sync with Supabase (in background, non-blocking with timeout)
+        (async () => {
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (session && isSupabaseConfigured()) {
+                    const timeoutPromise = new Promise((_, reject) => 
+                        setTimeout(() => reject(new Error('Timeout syncing favorite')), 3000)
+                    );
+
+                    let syncPromise;
+                    if (!shouldBeFavorite) {
+                        syncPromise = supabase
+                            .from('favorites')
+                            .delete()
+                            .eq('user_id', session.user.id)
+                            .eq('business_id', businessId);
+                    } else {
+                        syncPromise = supabase
+                            .from('favorites')
+                            .insert([{
+                                user_id: session.user.id,
+                                business_id: businessId
+                            }]);
+                    }
+
+                    await Promise.race([syncPromise, timeoutPromise]);
+                    console.log("Favorito sincronizado con Supabase");
                 }
-            } else {
-                console.log("No sincronizado: Sesión no disponible o Supabase no configurado");
-                if (!session) {
-                    console.warn("Usuario no autenticado, guardado solo local.");
-                }
+            } catch (error) {
+                console.warn("Aviso: Sincronización de favorito en la nube diferida (guardado localmente):", error);
             }
-        } catch (error) {
-            console.error("Error al sincronizar favorito con servidor:", error);
-            // El estado local se mantiene para no frustrar la navegación inmediata
-        }
+        })();
     }, []); // Eliminamos dependencias para evitar cierres obsoletos y re-creaciones de función
 
     return { favoriteIds, toggleFavorite };

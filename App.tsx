@@ -45,7 +45,7 @@ const AppContent: React.FC = () => {
     return window.matchMedia('(prefers-color-scheme: dark)').matches;
   });
 
-  const { favoriteIds, toggleFavorite, allReviews, addReview, profile, updateProfile, refreshData } = useAppContext();
+  const { favoriteIds, toggleFavorite, allReviews, addReview, refreshData } = useAppContext();
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -260,7 +260,6 @@ const AppContent: React.FC = () => {
             goBack={goBack} 
             onSaveReview={async (review) => {
               await addReview(selectedBusiness.id, review);
-              await updateProfile({ points: profile.points + 15 });
             }}
           />
         ) : <HomePage session={session} navigateTo={navigateTo} viewBusinessDetails={viewBusinessDetails} viewPromotionDetails={viewPromotionDetails} viewCategory={viewCategory} favoriteIds={favoriteIds} toggleFavorite={toggleFavorite} viewWriteReview={viewWriteReview} onSearchFocus={() => navigateTo('search')} />;

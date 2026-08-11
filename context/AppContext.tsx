@@ -44,14 +44,16 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     const isAdding = !favoriteIds.has(businessId);
     await rawToggleFavorite(businessId);
     if (isAdding) {
+      updateProfile({ points: (profile.points || 0) + 5 });
       showPointsToast(5, 'Guardaste un comercio en favoritos');
     }
-  }, [favoriteIds, rawToggleFavorite, showPointsToast]);
+  }, [favoriteIds, rawToggleFavorite, updateProfile, profile.points, showPointsToast]);
 
   const addReview = useCallback(async (businessId: string, review: Omit<Review, 'id' | 'date' | 'likes' | 'comments'>) => {
     await rawAddReview(businessId, review);
+    updateProfile({ points: (profile.points || 0) + 15 });
     showPointsToast(15, 'Escribiste una nueva reseña');
-  }, [rawAddReview, showPointsToast]);
+  }, [rawAddReview, updateProfile, profile.points, showPointsToast]);
 
   const refreshData = async () => {
     await Promise.all([refreshProfile(), refreshReviews()]);
