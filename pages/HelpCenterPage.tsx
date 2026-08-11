@@ -32,6 +32,7 @@ const HelpCenterPage: React.FC<{ goBack: () => void }> = ({ goBack }) => {
                     <h3 className="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-4 ml-1">Preguntas Frecuentes</h3>
                     <div className="bg-white dark:bg-slate-800 rounded-[40px] p-8 shadow-sm border border-white dark:border-slate-700 transition-colors">
                         <FAQItem q="¿Cómo guardo un comercio?" a="Solo tienes que tocar el icono del corazón en la tarjeta del comercio o en su página de detalles." />
+                        <FAQItem q="¿Cómo gano puntos en Casanova Guía?" a="¡Sumar puntos es muy fácil y automático! Recibes +10 pts de Bono de Bienvenida al registrarte, +15 pts por cada reseña que publiques y +5 pts por cada comercio que agregues a tus favoritos." />
                         <FAQItem q="¿Es gratis aparecer en la guía?" a="¡Sí! Por ahora el registro básico es totalmente gratuito para todos los comercios del barrio." />
                         <FAQItem q="¿Por qué no carga correctamente?" a="Si experimentas algún problema con la aplicación, simplemente recarga la pestaña de tu navegador para restablecer el estado." />
                     </div>

@@ -3,12 +3,14 @@ import React, { useState } from 'react';
 import { Page } from '../types';
 import { supabase, signInWithGoogle } from '../services/supabaseClient';
 import { ChevronLeftIcon } from '../components/Icons';
+import { useAppContext } from '../context/AppContext';
 
 interface RegisterPageProps {
     navigateTo: (page: Page) => void;
 }
 
 const RegisterPage: React.FC<RegisterPageProps> = ({ navigateTo }) => {
+    const { showPointsToast } = useAppContext();
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -36,7 +38,7 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ navigateTo }) => {
         setLoading(true);
         setError(null);
 
-        const defaultName = name.trim() || (role === 'merchant' ? 'Comerciante de Casanova' : 'Vecino de Casanova');
+        const defaultName = name.trim() || (role === 'merchant' ? 'Comercio Amigo de Casanova' : 'Vecino de Casanova');
 
         try {
             const { data, error: signUpError } = await supabase.auth.signUp({
@@ -75,6 +77,7 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ navigateTo }) => {
             if (data.user && !data.session) {
                 setSuccessMessage("¡Cuenta creada! Por favor, revisa tu email para confirmar tu cuenta antes de iniciar sesión.");
             } else {
+                showPointsToast(10, '¡Bono de Bienvenida sumado!');
                 navigateTo('home');
             }
         } catch (err: any) {
@@ -184,7 +187,7 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ navigateTo }) => {
                                         onClick={() => setRole('merchant')}
                                         className={`py-4 rounded-2xl font-black text-xs uppercase tracking-widest border transition-all ${role === 'merchant' ? 'bg-blue-600 dark:bg-yellow-400 text-white dark:text-slate-950 border-blue-600 dark:border-yellow-400 shadow-lg' : 'bg-white dark:bg-slate-800 text-gray-400 dark:text-slate-500 border-gray-100 dark:border-slate-800'}`}
                                     >
-                                        Comerciante
+                                        Comercio Amigo
                                     </button>
                                 </div>
                             </div>

@@ -1,7 +1,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { Business, Review } from '../types';
-import { ChevronLeftIcon, StarIcon, ChatAltIcon, NavigationIcon } from '../components/Icons';
+import { ChevronLeftIcon, StarIcon, ChatAltIcon, NavigationIcon, HeartIcon } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
 
 interface BusinessDetailPageProps {
@@ -60,8 +60,9 @@ const ReviewCard: React.FC<{review: Review, currentUserId?: string}> = ({review,
 }
 
 const BusinessDetailPage: React.FC<BusinessDetailPageProps> = ({ business, goBack, navigateToReview, customReviews = [] }) => {
-  const { profile } = useAppContext();
+  const { profile, favoriteIds, toggleFavorite } = useAppContext();
   const [imgError, setImgError] = useState(false);
+  const isFavorite = favoriteIds?.has(business.id) || false;
 
   const mergedReviews = useMemo(() => {
     return [...customReviews, ...business.reviews];
@@ -113,9 +114,22 @@ const BusinessDetailPage: React.FC<BusinessDetailPageProps> = ({ business, goBac
                     </span>
                     <h2 className="text-4xl font-black text-gray-800 dark:text-slate-100 tracking-tighter leading-none mt-1">{business.name}</h2>
                 </div>
-                <div className="bg-yellow-400 p-3 rounded-[24px] flex flex-col items-center min-w-[65px] shadow-lg shadow-yellow-200 dark:shadow-slate-900">
-                    <span className="text-white dark:text-slate-950 font-black text-2xl leading-none">{business.rating.toFixed(1)}</span>
-                    <StarIcon className="w-5 h-5 text-white dark:text-slate-950 mt-1" />
+                <div className="flex items-center space-x-2">
+                    <button 
+                        onClick={() => toggleFavorite(business.id)}
+                        className={`p-3 rounded-[24px] border transition-all active:scale-95 shadow-md ${
+                            isFavorite 
+                                ? 'bg-red-500 text-white border-red-500 shadow-red-200 dark:shadow-slate-900' 
+                                : 'bg-gray-50 dark:bg-slate-800 text-gray-400 dark:text-slate-500 border-gray-100 dark:border-slate-700'
+                        }`}
+                        title={isFavorite ? "Quitar de favoritos" : "Guardar en favoritos"}
+                    >
+                        <HeartIcon className={`w-6 h-6 ${isFavorite ? 'fill-current' : ''}`} />
+                    </button>
+                    <div className="bg-yellow-400 p-3 rounded-[24px] flex flex-col items-center min-w-[65px] shadow-lg shadow-yellow-200 dark:shadow-slate-900">
+                        <span className="text-white dark:text-slate-950 font-black text-2xl leading-none">{business.rating.toFixed(1)}</span>
+                        <StarIcon className="w-5 h-5 text-white dark:text-slate-950 mt-1" />
+                    </div>
                 </div>
             </div>
             <p className="mt-6 text-gray-600 dark:text-slate-400 text-lg font-medium italic border-l-4 border-blue-500 dark:border-yellow-400 pl-5 leading-relaxed">

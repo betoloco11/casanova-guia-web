@@ -1,9 +1,10 @@
 
-import React, { createContext, useContext, ReactNode } from 'react';
+import React, { createContext, useContext, ReactNode, useState, useCallback } from 'react';
 import { useUserProfile } from '../hooks/useUserProfile';
 import { useFavorites } from '../hooks/useFavorites';
 import { useReviews } from '../hooks/useReviews';
 import { UserProfile, Review } from '../types';
+import { PointsToastData, PointsToast } from '../components/PointsToast';
 
 interface AppContextType {
   profile: UserProfile;
@@ -13,14 +14,44 @@ interface AppContextType {
   allReviews: Record<string, Review[]>;
   addReview: (businessId: string, review: Omit<Review, 'id' | 'date' | 'likes' | 'comments'>) => Promise<void>;
   refreshData: () => Promise<void>;
+  pointsToast: PointsToastData | null;
+  showPointsToast: (points: number, message: string) => void;
+  clearPointsToast: () => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { profile, updateProfile, refreshProfile } = useUserProfile();
-  const { favoriteIds, toggleFavorite } = useFavorites();
-  const { allReviews, addReview, refreshReviews } = useReviews();
+  const { favoriteIds, toggleFavorite: rawToggleFavorite } = useFavorites();
+  const { allReviews, addReview: rawAddReview, refreshReviews } = useReviews();
+
+  const [pointsToast, setPointsToast] = useState<PointsToastData | null>(null);
+
+  const showPointsToast = useCallback((points: number, message: string) => {
+    setPointsToast({
+      id: Date.now(),
+      points,
+      message
+    });
+  }, []);
+
+  const clearPointsToast = useCallback(() => {
+    setPointsToast(null);
+  }, []);
+
+  const toggleFavorite = useCallback(async (businessId: string) => {
+    const isAdding = !favoriteIds.has(businessId);
+    await rawToggleFavorite(businessId);
+    if (isAdding) {
+      showPointsToast(5, 'Guardaste un comercio en favoritos');
+    }
+  }, [favoriteIds, rawToggleFavorite, showPointsToast]);
+
+  const addReview = useCallback(async (businessId: string, review: Omit<Review, 'id' | 'date' | 'likes' | 'comments'>) => {
+    await rawAddReview(businessId, review);
+    showPointsToast(15, 'Escribiste una nueva reseña');
+  }, [rawAddReview, showPointsToast]);
 
   const refreshData = async () => {
     await Promise.all([refreshProfile(), refreshReviews()]);
@@ -33,10 +64,18 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     toggleFavorite,
     allReviews,
     addReview,
-    refreshData
+    refreshData,
+    pointsToast,
+    showPointsToast,
+    clearPointsToast
   };
 
-  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
+  return (
+    <AppContext.Provider value={value}>
+      {children}
+      <PointsToast toast={pointsToast} onClose={clearPointsToast} />
+    </AppContext.Provider>
+  );
 };
 
 export const useAppContext = () => {
@@ -46,3 +85,4 @@ export const useAppContext = () => {
   }
   return context;
 };
+

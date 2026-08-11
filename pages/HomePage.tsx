@@ -99,18 +99,30 @@ const HomePage: React.FC<HomePageProps> = ({
   }, [searchQuery, businesses]);
 
   const getGreetingName = () => {
-    if (!profile?.name) return 'Vecino';
-    const raw = profile.name.trim();
-    if (raw === 'Cliente de Casanova' || raw === 'Cliente') {
-      return profile?.role === 'merchant' ? 'Comerciante' : 'Vecino';
+    // 1. Check user metadata from session (Google OAuth or signup metadata)
+    const metaName = session?.user?.user_metadata?.full_name || session?.user?.user_metadata?.name;
+    const rawName = profile?.name?.trim();
+
+    const isGenericPlaceholder = !rawName || [
+      'cliente de casanova',
+      'comerciante de casanova',
+      'vecino de casanova',
+      'comercio amigo de casanova',
+      'cliente',
+      'comerciante',
+      'comercio amigo',
+      'usuario'
+    ].includes(rawName.toLowerCase());
+
+    if (!isGenericPlaceholder && rawName) {
+      return rawName.split(' ')[0];
     }
-    if (raw === 'Vecino de Casanova') return 'Vecino';
-    if (raw === 'Comerciante de Casanova') return 'Comerciante';
-    const firstWord = raw.split(' ')[0];
-    if (firstWord.toLowerCase() === 'cliente') {
-      return profile?.role === 'merchant' ? 'Comerciante' : 'Vecino';
+
+    if (metaName && metaName.trim()) {
+      return metaName.trim().split(' ')[0];
     }
-    return firstWord;
+
+    return profile?.role === 'merchant' ? 'Comercio Amigo' : 'Vecino';
   };
 
   const isSearching = searchQuery.length > 0;

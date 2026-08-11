@@ -50,7 +50,7 @@ const WriteReviewPage: React.FC<WriteReviewPageProps> = ({ business, goBack, onS
             </div>
             <h2 className="text-4xl font-black text-gray-800 dark:text-slate-100 tracking-tighter">¡Reseña Publicada!</h2>
             <p className="mt-6 text-gray-600 dark:text-slate-400 text-lg font-medium leading-relaxed max-w-xs mx-auto">
-                Tu opinión ayuda a que otros {profile.role === 'merchant' ? 'comerciantes y clientes' : 'clientes'} de <strong>Casanova</strong> elijan mejor. ¡Sumaste 15 puntos!
+                Tu opinión ayuda a que otros {profile.role === 'merchant' ? 'comercios y vecinos' : 'vecinos'} de <strong>Casanova</strong> elijan mejor. ¡Sumaste 15 puntos!
             </p>
             <button 
                 onClick={goBack}

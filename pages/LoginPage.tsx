@@ -72,7 +72,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ navigateTo }) => {
                     <h1 className="text-4xl font-black text-gray-800 dark:text-slate-100 tracking-tighter text-center">
                         Casanova <span className="text-blue-600 dark:text-yellow-400">Guía</span>
                     </h1>
-                    <p className="text-gray-500 dark:text-slate-400 font-bold uppercase text-[10px] tracking-[0.3em] mt-2">Acceso Clientes y Comerciantes</p>
+                    <p className="text-gray-500 dark:text-slate-400 font-bold uppercase text-[10px] tracking-[0.3em] mt-2">Acceso Vecinos y Comercios Amigos</p>
                 </div>
 
                 <div className="mb-8">

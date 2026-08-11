@@ -91,10 +91,10 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, goBack, isDarkMod
   }, [profile?.points, userReviewsCount, favoriteIds?.size]);
 
   const getDisplayFullName = () => {
-    if (!profile?.name) return profile?.role === 'merchant' ? 'Comerciante de Casanova' : 'Vecino de Casanova';
+    if (!profile?.name) return profile?.role === 'merchant' ? 'Comercio Amigo de Casanova' : 'Vecino de Casanova';
     const raw = profile.name.trim();
-    if (raw === 'Cliente de Casanova' || raw === 'Cliente') {
-      return profile?.role === 'merchant' ? 'Comerciante de Casanova' : 'Vecino de Casanova';
+    if (['Cliente de Casanova', 'Cliente', 'Comerciante de Casanova', 'Comerciante'].includes(raw)) {
+      return profile?.role === 'merchant' ? 'Comercio Amigo de Casanova' : 'Vecino de Casanova';
     }
     return raw;
   };
@@ -177,7 +177,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, goBack, isDarkMod
                     </h2>
                     <p className="text-xs font-bold text-gray-400 dark:text-slate-500 mt-1 lowercase">{profile?.email}</p>
                     <p className="text-blue-600 dark:text-yellow-400 text-xs font-black uppercase tracking-[0.2em] mt-3 bg-white/80 dark:bg-slate-800/80 px-4 py-2 rounded-full w-fit border border-white dark:border-slate-700 shadow-sm transition-colors duration-300">
-                        {profile?.role === 'merchant' ? 'Comerciante Destacado' : 'Vecino Destacado'}
+                        {profile?.role === 'merchant' ? 'Comercio Amigo Destacado' : 'Vecino Destacado'}
                     </p>
                 </div>
             </div>
@@ -194,6 +194,49 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, goBack, isDarkMod
                 <div className="text-center">
                     <p className="text-2xl font-black text-gray-800 dark:text-slate-100 leading-none">{userPoints}</p>
                     <p className="text-xs font-black text-gray-400 dark:text-slate-500 uppercase mt-2 tracking-widest">Puntos</p>
+                </div>
+            </div>
+
+            {/* Tarjeta Informativa de Sistema de Puntos */}
+            <div className="mt-8 bg-gradient-to-br from-yellow-50 to-amber-100/80 dark:from-slate-800/90 dark:to-slate-900/90 rounded-[32px] p-6 border border-yellow-200/90 dark:border-yellow-500/20 shadow-sm relative overflow-hidden">
+                <div className="flex items-center space-x-3 mb-3">
+                    <div className="p-2.5 bg-yellow-400 text-slate-950 rounded-2xl shadow-sm font-black flex items-center justify-center">
+                        <StarIcon className="w-5 h-5 text-slate-950" />
+                    </div>
+                    <div>
+                        <h3 className="text-base font-black text-gray-900 dark:text-slate-100 tracking-tight leading-none">
+                            ¿Cómo sumás puntos?
+                        </h3>
+                        <p className="text-[10px] font-black text-amber-700 dark:text-yellow-400 uppercase tracking-widest mt-1">
+                            ¡Participá y destacate en la comunidad!
+                        </p>
+                    </div>
+                </div>
+
+                <div className="space-y-2 mt-4">
+                    <div className="flex items-center justify-between text-xs bg-white/80 dark:bg-slate-800/80 p-3 rounded-2xl border border-white/60 dark:border-slate-700/60 shadow-2xs">
+                        <div className="flex items-center space-x-2.5">
+                            <span className="text-base">🎁</span>
+                            <span className="font-bold text-gray-800 dark:text-slate-200">Bono de Bienvenida</span>
+                        </div>
+                        <span className="font-black text-amber-700 dark:text-yellow-400 bg-yellow-100/80 dark:bg-yellow-400/10 px-2.5 py-1 rounded-full text-[11px]">+10 pts</span>
+                    </div>
+
+                    <div className="flex items-center justify-between text-xs bg-white/80 dark:bg-slate-800/80 p-3 rounded-2xl border border-white/60 dark:border-slate-700/60 shadow-2xs">
+                        <div className="flex items-center space-x-2.5">
+                            <span className="text-base">✍️</span>
+                            <span className="font-bold text-gray-800 dark:text-slate-200">Reseñas Publicadas</span>
+                        </div>
+                        <span className="font-black text-amber-700 dark:text-yellow-400 bg-yellow-100/80 dark:bg-yellow-400/10 px-2.5 py-1 rounded-full text-[11px]">+15 pts c/u</span>
+                    </div>
+
+                    <div className="flex items-center justify-between text-xs bg-white/80 dark:bg-slate-800/80 p-3 rounded-2xl border border-white/60 dark:border-slate-700/60 shadow-2xs">
+                        <div className="flex items-center space-x-2.5">
+                            <span className="text-base">❤️</span>
+                            <span className="font-bold text-gray-800 dark:text-slate-200">Comercios en Favoritos</span>
+                        </div>
+                        <span className="font-black text-amber-700 dark:text-yellow-400 bg-yellow-100/80 dark:bg-yellow-400/10 px-2.5 py-1 rounded-full text-[11px]">+5 pts c/u</span>
+                    </div>
                 </div>
             </div>
         </div>
