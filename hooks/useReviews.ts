@@ -65,27 +65,17 @@ export const useReviews = () => {
   const addReview = useCallback(async (businessId: string, review: Omit<Review, 'id' | 'date' | 'likes' | 'comments'>) => {
     const tempId = Date.now().toString();
     const formattedDate = new Date().toLocaleDateString('es-AR', { day: 'numeric', month: 'long' }).toUpperCase();
-    
-    let userId = 'local_user';
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user?.id) {
-        userId = session.user.id;
-      }
-    } catch (e) {
-      console.warn("No se pudo obtener sesión de Supabase para la reseña, usando local:", e);
-    }
 
     const newReview: Review = {
       ...review,
       id: tempId,
-      userId,
+      userId: 'user_' + tempId,
       date: formattedDate,
       likes: 0,
       comments: 0
     };
 
-    // 1. Actualización local instantánea en UI y localStorage
+    // 1. Actualización local INSTANTÁNEA en UI y localStorage (0ms delay)
     setAllReviews(prev => {
       const businessReviews = Array.isArray(prev[businessId]) ? prev[businessId] : [];
       const updated = { ...prev, [businessId]: [newReview, ...businessReviews] };
@@ -94,34 +84,36 @@ export const useReviews = () => {
     });
 
     // 2. Intentar guardar en Supabase en segundo plano sin bloquear la UI
-    if (isSupabaseConfigured()) {
-      (async () => {
-        try {
-          const { data: { session } } = await supabase.auth.getSession();
-          if (!session) return;
+    (async () => {
+      if (!isSupabaseConfigured()) return;
+      try {
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Timeout guardando reseña')), 3000)
+        );
 
-          const timeoutPromise = new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Timeout guardando reseña')), 3000)
-          );
+        const sessionPromise = supabase.auth.getSession();
+        const sessionRes = await Promise.race([sessionPromise, timeoutPromise]) as any;
+        const session = sessionRes?.data?.session;
 
-          const insertPromise = supabase.from('reviews').insert([{
-            business_id: businessId,
-            user_id: session.user.id,
-            user_name: review.authorName,
-            user_photo: review.authorImage,
-            rating: review.rating,
-            comment: review.comment,
-            likes: 0,
-            comments_count: 0
-          }]);
+        if (!session) return;
 
-          await Promise.race([insertPromise, timeoutPromise]);
-          console.log("Reseña sincronizada en Supabase con éxito");
-        } catch (error: any) {
-          console.warn("Sincronización en la nube diferida (guardado localmente):", error);
-        }
-      })();
-    }
+        const insertPromise = supabase.from('reviews').insert([{
+          business_id: businessId,
+          user_id: session.user.id,
+          user_name: review.authorName,
+          user_photo: review.authorImage,
+          rating: review.rating,
+          comment: review.comment,
+          likes: 0,
+          comments_count: 0
+        }]);
+
+        await Promise.race([insertPromise, timeoutPromise]);
+        console.log("Reseña sincronizada en Supabase con éxito");
+      } catch (error: any) {
+        console.warn("Sincronización en la nube diferida (guardado localmente):", error);
+      }
+    })();
   }, []);
 
   const getBusinessReviews = useCallback((businessId: string) => {

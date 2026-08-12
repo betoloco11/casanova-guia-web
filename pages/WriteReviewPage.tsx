@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Business, Review } from '../types';
 import { ChevronLeftIcon, StarIcon, BadgeIcon } from '../components/Icons';
-import { useUserProfile } from '../hooks/useUserProfile';
+import { useAppContext } from '../context/AppContext';
 
 interface WriteReviewPageProps {
   business: Business;
@@ -11,7 +11,7 @@ interface WriteReviewPageProps {
 }
 
 const WriteReviewPage: React.FC<WriteReviewPageProps> = ({ business, goBack, onSaveReview }) => {
-  const { profile } = useUserProfile();
+  const { profile } = useAppContext();
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -28,17 +28,17 @@ const WriteReviewPage: React.FC<WriteReviewPageProps> = ({ business, goBack, onS
     try {
         if (onSaveReview) {
             await onSaveReview({
-                authorName: profile.name || 'Usuario de Casanova',
+                authorName: profile.name || 'Vecino de Casanova',
                 authorImage: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&q=80',
                 rating,
                 comment
             });
         }
-        setSubmitted(true);
     } catch (error) {
         console.error("Error al guardar reseña:", error);
     } finally {
         setIsSubmitting(false);
+        setSubmitted(true);
     }
   };
 

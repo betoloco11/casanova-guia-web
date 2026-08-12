@@ -195,41 +195,41 @@ export const useUserProfile = () => {
   }, [loadProfile]);
 
   const updateProfile = useCallback(async (newData: Partial<UserProfile>) => {
-    let currentUserId = profile.id;
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user?.id) {
-        currentUserId = session.user.id;
-      }
-    } catch (e) {
-      console.warn("No se pudo obtener sesión para updateProfile:", e);
-    }
+    // 1. Actualización local síncrona e inmediata
+    setProfile(prev => {
+      const updatedProfile: UserProfile = { ...prev, ...newData };
+      localStorage.setItem(USER_PROFILE_KEY, JSON.stringify(updatedProfile));
+      return updatedProfile;
+    });
 
-    // 1. Actualización local inmediata
-    const updatedProfile: UserProfile = { ...profile, ...newData, ...(currentUserId ? { id: currentUserId } : {}) };
-    setProfile(updatedProfile);
-    localStorage.setItem(USER_PROFILE_KEY, JSON.stringify(updatedProfile));
+    // 2. Sincronizar con Supabase en segundo plano totalmente asíncrono
+    (async () => {
+      try {
+        let currentUserId = profile.id;
+        if (!currentUserId && isSupabaseConfigured()) {
+          const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout session')), 2000));
+          const sessionRes = await Promise.race([supabase.auth.getSession(), timeoutPromise]) as any;
+          if (sessionRes?.data?.session?.user?.id) {
+            currentUserId = sessionRes.data.session.user.id;
+          }
+        }
 
-    // 2. Sincronizar con Supabase en segundo plano
-    if (isSupabaseConfigured() && currentUserId) {
-      (async () => {
-        try {
+        if (isSupabaseConfigured() && currentUserId) {
           const timeoutPromise = new Promise((_, reject) => 
             setTimeout(() => reject(new Error('Timeout updating profile')), 3000)
           );
 
           const upsertPromise = supabase
             .from('profiles')
-            .upsert({ id: currentUserId, ...updatedProfile });
+            .upsert({ id: currentUserId, ...profile, ...newData });
 
           await Promise.race([upsertPromise, timeoutPromise]);
           setIsSynced(true);
-        } catch (error: any) {
-          console.warn("Error o timeout actualizando perfil en Supabase (guardado localmente):", error);
-          setIsSynced(false);
         }
-      })();
-    }
+      } catch (error: any) {
+        console.warn("Sincronización de perfil diferida (guardado localmente):", error);
+      }
+    })();
   }, [profile]);
 
   return { profile, updateProfile, isSynced, refreshProfile: loadProfile };
