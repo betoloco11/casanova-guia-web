@@ -69,7 +69,7 @@ export const useReviews = () => {
     const newReview: Review = {
       ...review,
       id: tempId,
-      userId: 'user_' + tempId,
+      userId: review.userId || 'local_user',
       date: formattedDate,
       likes: 0,
       comments: 0

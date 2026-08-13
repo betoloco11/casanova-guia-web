@@ -16,14 +16,18 @@ const UserReviewsPage: React.FC<UserReviewsPageProps> = ({ goBack }) => {
         const list: any[] = [];
         if (!allReviews || typeof allReviews !== 'object') return list;
 
+        const currentId = profile?.id || 'local_user';
+        const currentName = profile?.name;
+
         Object.entries(allReviews).forEach(([businessId, reviews]) => {
             if (Array.isArray(reviews)) {
                 const business = mockBusinesses.find(b => b.id === businessId);
                 reviews.forEach(r => {
                     // Solo incluimos las reseñas que pertenecen al usuario actual
-                    const isOwner = profile?.id && r.userId === profile.id;
+                    const isOwnerByUserId = r.userId && (r.userId === currentId || r.userId === 'local_user');
+                    const isOwnerByName = currentName && r.authorName === currentName;
                     
-                    if (isOwner) {
+                    if (isOwnerByUserId || isOwnerByName) {
                         list.push({ 
                             ...r, 
                             businessId, 

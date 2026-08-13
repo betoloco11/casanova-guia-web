@@ -15,6 +15,7 @@ interface UserProfile {
 }
 
 const DEFAULT_PROFILE: UserProfile = {
+  id: 'local_user',
   name: 'Vecino de Casanova',
   email: '',
   neighborhood: 'Isidro Casanova',

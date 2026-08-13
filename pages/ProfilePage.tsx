@@ -68,20 +68,23 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, goBack, isDarkMod
   // Calcular total de reseñas del usuario
   const userReviewsCount = React.useMemo(() => {
     let count = 0;
-    if (!allReviews || !profile?.id) return 0;
+    if (!allReviews) return 0;
+    const currentId = profile?.id || 'local_user';
+    const currentName = profile?.name;
     
     Object.values(allReviews).forEach(businessReviews => {
       if (Array.isArray(businessReviews)) {
         businessReviews.forEach(review => {
-          const isOwner = review.userId === profile.id;
-          if (isOwner) {
+          const isOwnerByUserId = review.userId && (review.userId === currentId || review.userId === 'local_user');
+          const isOwnerByName = currentName && review.authorName === currentName;
+          if (isOwnerByUserId || isOwnerByName) {
             count++;
           }
         });
       }
     });
     return count;
-  }, [allReviews, profile?.id]);
+  }, [allReviews, profile?.id, profile?.name]);
 
   // Dynamic calculation of user points based on welcome bonus, reviews and favorites
   const userPoints = React.useMemo(() => {

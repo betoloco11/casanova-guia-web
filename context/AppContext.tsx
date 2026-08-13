@@ -50,10 +50,15 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   }, [favoriteIds, rawToggleFavorite, updateProfile, profile.points, showPointsToast]);
 
   const addReview = useCallback(async (businessId: string, review: Omit<Review, 'id' | 'date' | 'likes' | 'comments'>) => {
-    await rawAddReview(businessId, review);
-    updateProfile({ points: (profile.points || 0) + 15 });
+    const reviewWithUser = {
+      ...review,
+      userId: review.userId || profile?.id || 'local_user',
+      authorName: review.authorName || profile?.name || 'Vecino de Casanova'
+    };
+    await rawAddReview(businessId, reviewWithUser);
+    updateProfile({ points: (profile?.points || 0) + 15 });
     showPointsToast(15, 'Escribiste una nueva reseña');
-  }, [rawAddReview, updateProfile, profile.points, showPointsToast]);
+  }, [rawAddReview, updateProfile, profile, showPointsToast]);
 
   const refreshData = async () => {
     await Promise.all([refreshProfile(), refreshReviews()]);
