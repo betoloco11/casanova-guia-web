@@ -13,7 +13,7 @@ const AboutPage: React.FC<{ goBack: () => void }> = ({ goBack }) => {
             </header>
 
             <div className="p-10 text-center">
-                <LogoIcon className="w-24 h-24 mx-auto mb-8 shadow-xl rounded-[32px]" />
+                <LogoIcon className="w-24 h-24 mx-auto mb-8 shadow-xl rounded-full bg-white" />
                 <h2 className="text-3xl font-black text-gray-800 dark:text-slate-100 tracking-tighter leading-none">Casanova Guía Web</h2>
                 <p className="text-blue-600 dark:text-yellow-400 font-black uppercase text-xs tracking-[0.4em] mt-4 opacity-50 transition-colors">Versión 1.0.5</p>
                 

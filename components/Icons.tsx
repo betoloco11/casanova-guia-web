@@ -7,11 +7,11 @@ type IconProps = {
 
 export const LogoIcon: React.FC<IconProps> = ({ className }) => (
   <img 
-    src="https://i.imgur.com/WwQauF8.png" 
-    className={`${className} object-contain`} 
-    alt="Logo Casanova" 
+    src="https://i.postimg.cc/hGLN604Y/LOGO-FULL-FINAL.png" 
+    className={`${className || ''} object-contain select-none`} 
+    alt="Logo Casanova Guía Web" 
     onError={(e) => {
-      e.currentTarget.src = "https://ui-avatars.com/api/?name=C&background=3b82f6&color=fff&rounded=true";
+      e.currentTarget.src = "https://ui-avatars.com/api/?name=CG&background=facc15&color=000&rounded=true";
     }}
   />
 );

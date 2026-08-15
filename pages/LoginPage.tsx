@@ -68,7 +68,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ navigateTo }) => {
 
             <div className="w-full max-w-sm">
                 <div className="flex flex-col items-center mb-12">
-                    <LogoIcon className="w-24 h-24 mb-6 shadow-2xl rounded-[32px]" />
+                    <LogoIcon className="w-24 h-24 mb-6 shadow-2xl rounded-full bg-white" />
                     <h1 className="text-4xl font-black text-gray-800 dark:text-slate-100 tracking-tighter text-center">
                         Casanova <span className="text-blue-600 dark:text-yellow-400">Guía</span>
                     </h1>
