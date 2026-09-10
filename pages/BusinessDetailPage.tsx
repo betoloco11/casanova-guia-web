@@ -1,7 +1,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { Business, Review } from '../types';
-import { ChevronLeftIcon, StarIcon, ChatAltIcon, NavigationIcon, HeartIcon } from '../components/Icons';
+import { ChevronLeftIcon, StarIcon, ChatAltIcon, NavigationIcon, HeartIcon, InstagramIcon, FacebookIcon, XIcon } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
 
 interface BusinessDetailPageProps {
@@ -62,6 +62,8 @@ const ReviewCard: React.FC<{review: Review, currentUserId?: string}> = ({review,
 const BusinessDetailPage: React.FC<BusinessDetailPageProps> = ({ business, goBack, navigateToReview, customReviews = [] }) => {
   const { profile, favoriteIds, toggleFavorite } = useAppContext();
   const [imgError, setImgError] = useState(false);
+  const [logoError, setLogoError] = useState(false);
+  const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
   const isFavorite = favoriteIds?.has(business.id) || false;
 
   const mergedReviews = useMemo(() => {
@@ -76,7 +78,9 @@ const BusinessDetailPage: React.FC<BusinessDetailPageProps> = ({ business, goBac
 
   const handleWhatsApp = () => {
     if (business.whatsapp) {
-        const url = `https://wa.me/${business.whatsapp}?text=${encodeURIComponent('Hola! Vi tu comercio en Casanova Guía Web y quería hacerte una consulta.')}`;
+        const cleanNumber = business.whatsapp.replace(/\D/g, '');
+        const message = `¡Hola ${business.name}! Los vi en Casanova Guía Web y quería consultar para reservar una visita al salón.`;
+        const url = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(message)}`;
         window.open(url, '_blank');
     }
   };
@@ -105,7 +109,29 @@ const BusinessDetailPage: React.FC<BusinessDetailPageProps> = ({ business, goBac
         <div className="absolute inset-0 bg-gradient-to-t from-[#D1E9FF] dark:from-slate-950 via-transparent to-black/20"></div>
       </div>
 
-      <div className="px-5 -mt-16 relative z-10 pb-32">
+      <div className="px-5 -mt-20 relative z-10 pb-32">
+        {/* Official Commerce Logo Medallion & Verified Badge */}
+        <div className="flex items-end justify-between mb-4 px-2">
+          <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl bg-white dark:bg-slate-900 p-2 shadow-2xl border-4 border-white dark:border-slate-800 flex items-center justify-center overflow-hidden flex-shrink-0">
+            {!logoError && (business.logo || business.image) ? (
+              <img 
+                src={business.logo || business.image} 
+                alt={`Logo oficial de ${business.name}`} 
+                onError={() => setLogoError(true)}
+                className="w-full h-full object-contain rounded-2xl bg-white select-none" 
+              />
+            ) : (
+              <div className="w-full h-full bg-blue-600 dark:bg-yellow-400 rounded-2xl flex items-center justify-center text-white dark:text-slate-950 font-black text-3xl">
+                {business.name.charAt(0)}
+              </div>
+            )}
+          </div>
+          <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md px-4 py-2 rounded-full border border-white dark:border-slate-800 shadow-md flex items-center space-x-2 mb-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse"></span>
+            <span className="text-[10px] font-black uppercase tracking-widest text-gray-700 dark:text-slate-200">Comercio Verificado</span>
+          </div>
+        </div>
+
         <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm rounded-[40px] p-8 shadow-xl shadow-blue-900/10 dark:shadow-slate-900/50 border border-white dark:border-slate-800 transition-colors duration-300">
             <div className="flex justify-between items-start">
                 <div className="flex-1 pr-4">
@@ -174,8 +200,83 @@ const BusinessDetailPage: React.FC<BusinessDetailPageProps> = ({ business, goBac
                     {!business.phone && !business.whatsapp && (
                         <p className="text-xs text-gray-500 dark:text-slate-400 font-medium italic">Contacto a través de atención presencial o redes sociales.</p>
                     )}
+
+                    {(business.instagram || business.facebook) && (
+                        <div className="pt-6 mt-6 border-t border-blue-50 dark:border-slate-700">
+                            <span className="text-xs font-black text-blue-400 dark:text-yellow-400 uppercase tracking-widest block mb-3">Redes Sociales</span>
+                            <div className="flex flex-wrap gap-3">
+                                {business.instagram && (
+                                    <a
+                                        href={`https://instagram.com/${business.instagram.replace(/^@/, '')}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center space-x-2 bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500 text-white px-5 py-2.5 rounded-2xl text-xs font-bold shadow-md hover:opacity-95 active:scale-95 transition-all"
+                                    >
+                                        <InstagramIcon className="w-4 h-4" />
+                                        <span>@{business.instagram.replace(/^@/, '')}</span>
+                                    </a>
+                                )}
+                                {business.facebook && (
+                                    <a
+                                        href={business.facebook.startsWith('http') ? business.facebook : `https://www.facebook.com/search/top?q=${encodeURIComponent(business.facebook)}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center space-x-2 bg-[#1877F2] text-white px-5 py-2.5 rounded-2xl text-xs font-bold shadow-md hover:opacity-95 active:scale-95 transition-all"
+                                    >
+                                        <FacebookIcon className="w-4 h-4" />
+                                        <span>{business.facebook}</span>
+                                    </a>
+                                )}
+                            </div>
+                        </div>
+                    )}
                 </div>
             </section>
+
+            {business.products && business.products.length > 0 && (
+                <section>
+                    <div className="px-3 mb-2">
+                        <h3 className="text-2xl font-black text-gray-800 dark:text-slate-100 tracking-tight">Servicios e Instalaciones</h3>
+                    </div>
+                    <div className="space-y-3">
+                        {business.products.map(product => (
+                            <div key={product.id} className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-[32px] p-5 border border-white dark:border-slate-700 shadow-sm flex items-center space-x-4">
+                                {product.image && (
+                                    <img src={product.image} alt={product.name} className="w-20 h-20 rounded-2xl object-cover flex-shrink-0 shadow-md" />
+                                )}
+                                <div className="flex-1 min-w-0">
+                                    <h4 className="font-bold text-base text-gray-800 dark:text-slate-100 leading-tight">{product.name}</h4>
+                                    <p className="text-xs text-gray-600 dark:text-slate-400 mt-1 leading-relaxed">{product.description}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </section>
+            )}
+
+            {business.photos && business.photos.length > 0 && (
+                <section>
+                    <div className="px-3 mb-2 flex items-center justify-between">
+                        <h3 className="text-2xl font-black text-gray-800 dark:text-slate-100 tracking-tight">Galería de Fotos</h3>
+                        <span className="text-xs font-bold text-blue-500 dark:text-yellow-400 bg-blue-50 dark:bg-slate-800 px-3 py-1 rounded-full">{business.photos.length} fotos</span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                        {business.photos.map((photo, idx) => (
+                            <div 
+                                key={idx} 
+                                onClick={() => setSelectedPhoto(photo)}
+                                className="relative h-40 rounded-3xl overflow-hidden shadow-md cursor-pointer group bg-gray-100 dark:bg-slate-800 border border-white dark:border-slate-700 active:scale-95 transition-all"
+                            >
+                                <img 
+                                    src={photo} 
+                                    alt={`${business.name} ${idx + 1}`} 
+                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                />
+                            </div>
+                        ))}
+                    </div>
+                </section>
+            )}
 
             <section>
                 <div className="flex justify-between items-center mb-3 px-3">
@@ -219,6 +320,25 @@ const BusinessDetailPage: React.FC<BusinessDetailPageProps> = ({ business, goBac
             <ChatAltIcon className="w-8 h-8" />
             <span className="font-black text-sm uppercase tracking-widest">Consultar</span>
         </button>
+      )}
+
+      {selectedPhoto && (
+        <div 
+          className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4"
+          onClick={() => setSelectedPhoto(null)}
+        >
+          <button 
+            onClick={() => setSelectedPhoto(null)} 
+            className="absolute top-6 right-6 text-white/80 hover:text-white p-3 rounded-full bg-white/10"
+          >
+            <XIcon className="w-6 h-6" />
+          </button>
+          <img 
+            src={selectedPhoto} 
+            alt="Ampliación de foto" 
+            className="max-w-full max-h-[85vh] object-contain rounded-3xl shadow-2xl"
+          />
+        </div>
       )}
     </div>
   );

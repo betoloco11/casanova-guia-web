@@ -11,12 +11,13 @@ const SuggestBusinessPage: React.FC<{ goBack: () => void }> = ({ goBack }) => {
     const [formData, setFormData] = useState({
         name: '',
         category: '',
-        address: ''
+        address: '',
+        logo: ''
     });
 
     const handleSubmit = async () => {
-        if (!formData.name || !formData.category) {
-            setShowErrorModal("Por favor completa al menos el nombre y rubro.");
+        if (!formData.name || !formData.category || !formData.logo) {
+            setShowErrorModal("El Logo es obligatorio para identificar al comercio. Por favor completa el nombre, rubro y enlace del logo.");
             return;
         }
 
@@ -112,6 +113,26 @@ const SuggestBusinessPage: React.FC<{ goBack: () => void }> = ({ goBack }) => {
                             placeholder="Calle y número" 
                             className="w-full mt-2 bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 rounded-[32px] p-6 text-sm font-bold text-gray-800 dark:text-slate-100 focus:outline-none focus:ring-4 focus:ring-blue-100 dark:focus:ring-indigo-900 transition-all shadow-sm" 
                         />
+                    </div>
+                    <div>
+                        <div className="flex items-center justify-between ml-1">
+                            <label className="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest">Logo Oficial del Comercio</label>
+                            <span className="text-[10px] font-black text-red-500 bg-red-50 dark:bg-red-950/40 px-2.5 py-0.5 rounded-full uppercase tracking-widest border border-red-200 dark:border-red-900/50">Obligatorio</span>
+                        </div>
+                        <input 
+                            type="url" 
+                            value={formData.logo}
+                            onChange={(e) => setFormData({...formData, logo: e.target.value})}
+                            placeholder="Enlace directo al logo (ej: https://.../logo.png)" 
+                            className="w-full mt-2 bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 rounded-[32px] p-6 text-sm font-bold text-gray-800 dark:text-slate-100 focus:outline-none focus:ring-4 focus:ring-blue-100 dark:focus:ring-indigo-900 transition-all shadow-sm" 
+                        />
+                        <p className="text-[11px] text-gray-400 dark:text-slate-500 mt-2 px-2 font-medium">El logo es fundamental para que los vecinos reconozcan la marca del comercio en la portada y tarjetas de la guía.</p>
+                        {formData.logo && (
+                            <div className="mt-3 p-3 bg-gray-50 dark:bg-slate-900 rounded-2xl flex items-center space-x-3 border border-gray-100 dark:border-slate-700">
+                                <img src={formData.logo} alt="Vista previa de logo" className="w-12 h-12 rounded-xl object-contain bg-white p-1 border" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
+                                <span className="text-xs font-bold text-gray-600 dark:text-slate-300">Vista previa del logo</span>
+                            </div>
+                        )}
                     </div>
                     
                     <button 

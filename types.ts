@@ -42,6 +42,7 @@ export interface Business {
   reviewCount: number;
   distance: number; 
   image: string;
+  logo?: string;
   address: string;
   phone: string;
   whatsapp?: string; // Número de WhatsApp (ej: 5411...)
@@ -54,6 +55,8 @@ export interface Business {
   isFavorite?: boolean;
   landmarks?: string;
   coordinates?: { top: string; left: string };
+  instagram?: string;
+  facebook?: string;
 }
 
 export interface Promotion {

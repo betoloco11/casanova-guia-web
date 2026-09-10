@@ -45,6 +45,15 @@ const BusinessCard: React.FC<BusinessCardProps> = ({ business, onSelect, isFavor
             <span className="text-blue-600 dark:text-yellow-400 font-black text-2xl">{business.name.charAt(0)}</span>
           </div>
         )}
+        {business.logo && (
+          <div className="absolute -bottom-1.5 -right-1.5 w-8 h-8 rounded-full bg-white dark:bg-slate-800 p-0.5 border-2 border-white dark:border-slate-700 shadow-md flex items-center justify-center overflow-hidden z-10">
+            <img 
+              src={business.logo} 
+              alt={`Logo de ${business.name}`} 
+              className="w-full h-full object-contain rounded-full bg-white" 
+            />
+          </div>
+        )}
       </div>
       <div className="flex-grow min-w-0">
         <h3 className="font-extrabold text-lg text-gray-800 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-yellow-400 transition-colors leading-tight truncate">{business.name}</h3>

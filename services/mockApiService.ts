@@ -4,6 +4,18 @@ import { supabase, isSupabaseConfigured } from './supabaseClient';
 
 export const mockPromotions: Promotion[] = [
     {
+        id: 'promo_emoji',
+        title: 'Cumpleaños Inolvidables en EMOJI',
+        description: 'Vení a conocer nuestras instalaciones con cita previa. Pelotero gigante, sector living y diversión asegurada.',
+        validity: 'Temporada 2024 / 2025',
+        conditions: 'Reservas y visitas con cita previa por WhatsApp.',
+        image: 'https://i.postimg.cc/9fKJfJcz/0-foto-portada.jpg',
+        businessId: 'b_emoji',
+        businessName: 'EMOJI Multieventos',
+        businessType: 'Salón de Fiestas y Eventos',
+        businessLogo: 'https://i.postimg.cc/wT22N69w/LOGO-OK.png'
+    },
+    {
         id: 'promo1',
         title: '20% OFF en Panadería "El Sol"',
         description: 'Válido en todos los productos de pastelería artesanal.',
@@ -336,7 +348,68 @@ export const mockBusinesses: Business[] = [
     reviews: []
   },
 
-  // SERVICES (Servicios) - 4
+  // SERVICES (Servicios) - 5
+  {
+    id: 'b_emoji',
+    categoryId: 'services',
+    name: 'EMOJI Multieventos',
+    type: 'Salón de Fiestas y Eventos',
+    rating: 5.0,
+    reviewCount: 1,
+    distance: 0.5,
+    image: 'https://i.postimg.cc/9fKJfJcz/0-foto-portada.jpg',
+    logo: 'https://i.postimg.cc/wT22N69w/LOGO-OK.png',
+    address: 'Av. Cristianía 2.020 – Isidro Casanova',
+    landmarks: 'Av. Cristianía 2020 (Isidro Casanova)',
+    coordinates: { top: '35%', left: '50%' },
+    phone: '15 5507 6115',
+    whatsapp: '5491155076115',
+    hours: 'Visitas con cita previa por WhatsApp',
+    description: 'Somos una idea familiar nacida en el 2022 con la misión de crear un espacio donde los grandes momentos se vuelvan inolvidables. En nuestro local, nos esforzamos por brindar una experiencia única y divertida para toda la familia.',
+    photos: [
+      'https://i.postimg.cc/9fKJfJcz/0-foto-portada.jpg',
+      'https://i.postimg.cc/Dyn5mW3q/2.jpg',
+      'https://i.postimg.cc/3rgnKXVk/3.jpg',
+      'https://i.postimg.cc/Ghdz9BnQ/5.jpg',
+      'https://i.postimg.cc/L5BTNSL8/1.jpg',
+      'https://i.postimg.cc/PrTKNLnw/4.jpg'
+    ],
+    products: [
+      {
+        id: 'p_emoji_1',
+        name: 'Pelotero Gigante y Juegos',
+        description: 'Torre de pelotero con tubos, toboganes, inflables y metegol para máxima diversión infantil con seguridad.',
+        image: 'https://i.postimg.cc/Dyn5mW3q/2.jpg'
+      },
+      {
+        id: 'p_emoji_2',
+        name: 'Animación y Shows LED',
+        description: 'Robot LED interactivo, música, luces y entretenimiento dinámico para agasajados y familias.',
+        image: 'https://i.postimg.cc/Ghdz9BnQ/5.jpg'
+      },
+      {
+        id: 'p_emoji_3',
+        name: 'Sector de Living y Festejos',
+        description: 'Ambientes climatizados, mesas decoradas temáticas, vajilla y espacio confortable para adultos.',
+        image: 'https://i.postimg.cc/L5BTNSL8/1.jpg'
+      }
+    ],
+    promotions: [],
+    reviews: [
+      {
+        id: 'r_emoji_1',
+        authorName: 'Familia Vecina de Casanova',
+        authorImage: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&q=80',
+        date: 'Reciente',
+        rating: 5,
+        comment: 'Excelente atención de la familia de EMOJI. Las instalaciones impecables y los chicos la pasaron genial.',
+        likes: 4,
+        comments: 0
+      }
+    ],
+    instagram: 'emoji_multievento_pelotero',
+    facebook: 'EMOJI Multieventos'
+  },
   {
     id: 'b15',
     categoryId: 'services',
