@@ -365,7 +365,7 @@ export const mockBusinesses: Business[] = [
     phone: '15 5507 6115',
     whatsapp: '5491155076115',
     hours: 'Visitas con cita previa por WhatsApp',
-    description: 'Somos una idea familiar nacida en el 2022 con la misión de crear un espacio donde los grandes momentos se vuelvan inolvidables. En nuestro local, nos esforzamos por brindar una experiencia única y divertida para toda la familia.',
+    description: 'Salón de fiestas infantiles y multieventos en Isidro Casanova. Pelotero gigante, laberinto con toboganes, inflables, metegol, animación, show de robot LED interactivo, cumpleaños, eventos familiares, bautismos, comuniones y sector de living climatizado con vajilla completa para adultos.',
     photos: [
       'https://i.postimg.cc/9fKJfJcz/0-foto-portada.jpg',
       'https://i.postimg.cc/Dyn5mW3q/2.jpg',
@@ -856,13 +856,17 @@ export const getBusinesses = async (): Promise<Business[]> => {
     const { data, error } = await Promise.race([fetchPromise, timeoutPromise]) as any;
     
     if (error) throw error;
-    if (!data || data.length === 0) return mockBusinesses;
     
-    return data.map((b: any) => ({
+    const dbBusinesses: Business[] = (data && data.length > 0) ? data.map((b: any) => ({
       ...b,
       categoryId: b.category_id,
       reviewCount: b.review_count
-    })) as Business[];
+    })) : [];
+
+    // Fusionar de forma segura comercios de Supabase con los de mock (ej: b_emoji) que no estén en la base de datos
+    const dbIds = new Set(dbBusinesses.map(b => b.id));
+    const missingMocks = mockBusinesses.filter(b => !dbIds.has(b.id));
+    return [...dbBusinesses, ...missingMocks];
   } catch (error) {
     console.warn("Notice: Could not fetch businesses from Supabase, using mock fallback:", error);
     return mockBusinesses;
@@ -885,13 +889,16 @@ export const getBusinessesByCategory = async (categoryId: string): Promise<Busin
     const { data, error } = await Promise.race([fetchPromise, timeoutPromise]) as any;
     
     if (error) throw error;
-    if (!data || data.length === 0) return mockBusinesses.filter(b => b.categoryId === categoryId);
     
-    return data.map((b: any) => ({
+    const dbBusinesses: Business[] = (data && data.length > 0) ? data.map((b: any) => ({
       ...b,
       categoryId: b.category_id,
       reviewCount: b.review_count
-    })) as Business[];
+    })) : [];
+
+    const dbIds = new Set(dbBusinesses.map(b => b.id));
+    const missingMocks = mockBusinesses.filter(b => b.categoryId === categoryId && !dbIds.has(b.id));
+    return [...dbBusinesses, ...missingMocks];
   } catch (error) {
     console.warn("Notice: Could not fetch businesses by category from Supabase, using mock fallback:", error);
     return mockBusinesses.filter(b => b.categoryId === categoryId);
@@ -899,7 +906,8 @@ export const getBusinessesByCategory = async (categoryId: string): Promise<Busin
 };
 
 export const getBusinessById = async (id: string): Promise<Business | null> => {
-  if (!isSupabaseConfigured()) return mockBusinesses.find(b => b.id === id) || null;
+  const mockMatch = mockBusinesses.find(b => b.id === id) || null;
+  if (!isSupabaseConfigured()) return mockMatch;
 
   try {
     const timeoutPromise = new Promise((_, reject) => 
@@ -914,7 +922,7 @@ export const getBusinessById = async (id: string): Promise<Business | null> => {
 
     const { data, error } = await Promise.race([fetchPromise, timeoutPromise]) as any;
     
-    if (error) throw error;
+    if (error || !data) return mockMatch;
     return {
       ...data,
       categoryId: data.category_id,
@@ -922,7 +930,7 @@ export const getBusinessById = async (id: string): Promise<Business | null> => {
     } as Business;
   } catch (error) {
     console.warn("Notice: Could not fetch business by ID from Supabase, using mock fallback:", error);
-    return mockBusinesses.find(b => b.id === id) || null;
+    return mockMatch;
   }
 };
 

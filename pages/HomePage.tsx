@@ -7,6 +7,7 @@ import { Business, Promotion, Category, Page } from '../types';
 import { getBusinesses, getPromotions } from '../services/mockApiService';
 import { ChevronLeftIcon, UserCircleIcon } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
+import { matchesSearchQuery } from '../utils/searchUtils';
 
 const PromotionCard: React.FC<{promotion: Promotion, onSelect: (id: string) => void}> = ({ promotion, onSelect }) => (
     <div 
@@ -90,12 +91,7 @@ const HomePage: React.FC<HomePageProps> = ({
 
   const filteredBusinesses = useMemo(() => {
     if (!searchQuery.trim()) return businesses.slice(0, 4); // Límite de 4 para recomendados
-    const q = searchQuery.toLowerCase();
-    return businesses.filter(b => 
-      b.name.toLowerCase().includes(q) || 
-      b.type.toLowerCase().includes(q) || 
-      b.description.toLowerCase().includes(q)
-    );
+    return businesses.filter(b => matchesSearchQuery(b, searchQuery));
   }, [searchQuery, businesses]);
 
   const getGreetingName = () => {

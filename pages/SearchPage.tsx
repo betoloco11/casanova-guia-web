@@ -4,7 +4,8 @@ import { ChevronLeftIcon, MapIcon } from '../components/Icons';
 import SearchBar from '../components/SearchBar';
 import BusinessCard from '../components/BusinessCard';
 import { getBusinesses } from '../services/mockApiService';
-import { useFavorites } from '../hooks/useFavorites';
+import { useAppContext } from '../context/AppContext';
+import { matchesSearchQuery } from '../utils/searchUtils';
 import { Page, Business } from '../types';
 import { CATEGORIES } from '../constants';
 
@@ -43,7 +44,7 @@ const SearchPage: React.FC<SearchPageProps> = ({ goBack, viewBusinessDetails, on
   const [activeCategoryId, setActiveCategoryId] = useState<string | null>(null);
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [loading, setLoading] = useState(true);
-  const { favoriteIds, toggleFavorite } = useFavorites();
+  const { favoriteIds, toggleFavorite } = useAppContext();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -63,12 +64,7 @@ const SearchPage: React.FC<SearchPageProps> = ({ goBack, viewBusinessDetails, on
     }
     
     if (query.trim()) {
-      const q = query.toLowerCase();
-      results = results.filter(b => 
-        b.name.toLowerCase().includes(q) || 
-        b.type.toLowerCase().includes(q) ||
-        b.description.toLowerCase().includes(q)
-      );
+      results = results.filter(b => matchesSearchQuery(b, query));
     }
     
     return results;

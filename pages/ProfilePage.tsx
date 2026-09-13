@@ -106,30 +106,45 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, goBack, isDarkMod
         try {
             console.log("Iniciando cierre de sesión...");
             
-            // 1. Intentamos cerrar sesión en Supabase PRIMERO
-            // Esto es crucial para que Supabase pueda usar el token actual para invalidar la sesión
+            // 1. Respaldar datos críticos antes de cualquier acción
+            const currentTheme = localStorage.getItem('theme');
+            const permFavs = localStorage.getItem('casanova_permanent_favorites');
+            const lkgFavs = localStorage.getItem('casanova_favorites_last_known_good');
+            const favBackup = localStorage.getItem('casanova_favorites_backup_v2');
+            const legacyFavs = localStorage.getItem('business_favorites');
+            const userEmail = profile?.email;
+            const userScopedFavs = userEmail ? localStorage.getItem(`casanova_favs_${userEmail.trim().toLowerCase()}`) : null;
+            
+            // 2. Cerrar sesión en Supabase
             await supabase.auth.signOut();
             console.log("Supabase signOut completado");
             
-            // 2. Preservamos el tema antes de limpiar el resto
-            const currentTheme = localStorage.getItem('theme');
-            
-            // 3. Limpiamos el cache local
-            localStorage.clear();
-            
-            // 4. Restauramos el tema
-            if (currentTheme) {
-                localStorage.setItem('theme', currentTheme);
+            // 3. Limpiar selectivamente únicamente tokens de autenticación de sesión
+            try {
+                const keysToRemove: string[] = [];
+                for (let i = 0; i < localStorage.length; i++) {
+                    const k = localStorage.key(i);
+                    if (k && (k.startsWith('sb-') || k.includes('auth-token') || k === 'casanova_user_profile_v1' || k === 'casanova_user_profile')) {
+                        keysToRemove.push(k);
+                    }
+                }
+                keysToRemove.forEach(k => localStorage.removeItem(k));
+            } catch (cleanErr) {
+                console.warn("Error limpiando tokens:", cleanErr);
             }
+
+            // 4. Asegurar que los favoritos y el tema sigan intactos
+            if (currentTheme) localStorage.setItem('theme', currentTheme);
+            if (permFavs) localStorage.setItem('casanova_permanent_favorites', permFavs);
+            if (lkgFavs) localStorage.setItem('casanova_favorites_last_known_good', lkgFavs);
+            if (favBackup) localStorage.setItem('casanova_favorites_backup_v2', favBackup);
+            if (legacyFavs) localStorage.setItem('business_favorites', legacyFavs);
+            if (userScopedFavs && userEmail) localStorage.setItem(`casanova_favs_${userEmail.trim().toLowerCase()}`, userScopedFavs);
+
         } catch (error) {
-            console.error("Error detallado al cerrar sesión:", error);
-            // Fallback agresivo: si Supabase falla, al menos limpiamos el local
-            const theme = localStorage.getItem('theme');
-            localStorage.clear();
-            if (theme) localStorage.setItem('theme', theme);
+            console.error("Error al cerrar sesión:", error);
         } finally {
             console.log("Redirigiendo al inicio...");
-            // Usamos un método más directo para forzar el reinicio limpio de la app
             window.location.assign('/');
         }
     };

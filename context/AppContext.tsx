@@ -11,6 +11,7 @@ interface AppContextType {
   updateProfile: (updates: Partial<UserProfile>) => Promise<void>;
   favoriteIds: Set<string>;
   toggleFavorite: (businessId: string) => Promise<void>;
+  refreshFavorites?: () => Promise<void>;
   allReviews: Record<string, Review[]>;
   addReview: (businessId: string, review: Omit<Review, 'id' | 'date' | 'likes' | 'comments'>) => Promise<void>;
   refreshData: () => Promise<void>;
@@ -23,7 +24,7 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { profile, updateProfile, refreshProfile } = useUserProfile();
-  const { favoriteIds, toggleFavorite: rawToggleFavorite } = useFavorites();
+  const { favoriteIds, toggleFavorite: rawToggleFavorite, refreshFavorites } = useFavorites();
   const { allReviews, addReview: rawAddReview, refreshReviews } = useReviews();
 
   const [pointsToast, setPointsToast] = useState<PointsToastData | null>(null);
@@ -61,7 +62,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   }, [rawAddReview, updateProfile, profile, showPointsToast]);
 
   const refreshData = async () => {
-    await Promise.all([refreshProfile(), refreshReviews()]);
+    await Promise.all([
+      refreshProfile(), 
+      refreshReviews(), 
+      refreshFavorites ? refreshFavorites() : Promise.resolve()
+    ]);
   };
 
   const value = {
@@ -69,6 +74,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     updateProfile,
     favoriteIds,
     toggleFavorite,
+    refreshFavorites,
     allReviews,
     addReview,
     refreshData,
