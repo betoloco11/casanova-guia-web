@@ -56,17 +56,17 @@ const BusinessCard: React.FC<BusinessCardProps> = ({ business, onSelect, isFavor
         )}
       </div>
       <div className="flex-grow min-w-0">
-        <h3 className="font-extrabold text-lg text-gray-800 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-yellow-400 transition-colors leading-tight truncate">{business.name}</h3>
-        <p className="text-sm text-gray-500 dark:text-slate-400 font-bold mt-1 uppercase tracking-tight truncate">{business.type}</p>
-        <div className="flex items-center text-sm text-gray-600 dark:text-slate-300 mt-3">
-          <div className="flex items-center bg-yellow-50 dark:bg-slate-700/50 px-2 py-1 rounded-md">
+        <h3 className="font-extrabold text-lg sm:text-xl text-gray-800 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-yellow-400 transition-colors leading-tight truncate">{business.name}</h3>
+        <p className="text-sm font-extrabold text-gray-600 dark:text-slate-300 mt-1 uppercase tracking-tight truncate">{business.type}</p>
+        <div className="flex items-center text-sm sm:text-base text-gray-700 dark:text-slate-200 mt-3">
+          <div className="flex items-center bg-yellow-50 dark:bg-slate-700/70 px-2.5 py-1 rounded-md">
             <StarIcon className="w-4 h-4 text-yellow-500 mr-1" />
-            <span className="font-bold text-yellow-700 dark:text-yellow-500">{business.rating.toFixed(1)}</span>
+            <span className="font-bold text-yellow-700 dark:text-yellow-400">{business.rating.toFixed(1)}</span>
           </div>
           <span className="mx-2 text-gray-300 dark:text-slate-700">•</span>
           <button 
             onClick={openMap}
-            className="flex items-center space-x-1.5 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors bg-gray-50 dark:bg-slate-700/30 px-2 py-1 rounded-md border border-gray-100 dark:border-slate-700"
+            className="flex items-center space-x-1.5 hover:text-blue-500 dark:hover:text-yellow-400 transition-colors bg-gray-50 dark:bg-slate-700/50 px-2.5 py-1 rounded-md border border-gray-100 dark:border-slate-700"
           >
             <MapIcon className="w-4 h-4" />
             <span className="font-bold">{business.distance} km</span>

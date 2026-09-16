@@ -38,18 +38,18 @@ const PromotionDetailPage: React.FC<PromotionDetailPageProps> = ({ promotion, go
 
                 <div className="grid grid-cols-1 gap-6">
                     <div className="bg-gray-50 dark:bg-slate-900/50 p-6 rounded-[32px] border border-gray-100 dark:border-slate-800 shadow-sm">
-                        <h3 className="text-[10px] font-black text-blue-400 dark:text-yellow-400 uppercase tracking-widest mb-2">Validez</h3>
-                        <p className="font-bold text-gray-800 dark:text-slate-200">{promotion.validity}</p>
+                        <h3 className="text-xs sm:text-sm font-black text-blue-500 dark:text-yellow-400 uppercase tracking-wider mb-2">Validez</h3>
+                        <p className="font-extrabold text-lg text-gray-900 dark:text-slate-100">{promotion.validity}</p>
                     </div>
 
                     <div className="bg-gray-50 dark:bg-slate-900/50 p-6 rounded-[32px] border border-gray-100 dark:border-slate-800 shadow-sm">
-                        <h3 className="text-[10px] font-black text-blue-400 dark:text-yellow-400 uppercase tracking-widest mb-2">Condiciones</h3>
-                        <p className="text-gray-600 dark:text-slate-400 font-medium leading-relaxed">{promotion.conditions}</p>
+                        <h3 className="text-xs sm:text-sm font-black text-blue-500 dark:text-yellow-400 uppercase tracking-wider mb-2">Condiciones</h3>
+                        <p className="text-base text-gray-800 dark:text-slate-200 font-normal leading-relaxed">{promotion.conditions}</p>
                     </div>
                 </div>
 
                 <div>
-                    <h3 className="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-4 ml-2">Comercio Adherido</h3>
+                    <h3 className="text-xs sm:text-sm font-black text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-4 ml-2">Comercio Adherido</h3>
                     <div 
                         onClick={() => viewBusinessDetails(promotion.businessId)} 
                         className="flex items-center space-x-4 bg-blue-50/50 dark:bg-slate-900/50 p-5 rounded-[32px] cursor-pointer border border-blue-100 dark:border-yellow-900/50 hover:bg-blue-100 dark:hover:bg-yellow-900/20 transition-all active:scale-95"

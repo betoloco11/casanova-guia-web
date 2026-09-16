@@ -26,8 +26,8 @@ const InfoRow: React.FC<{label: string; value: string; onClick?: () => void}> = 
         onClick={onClick}
     >
         <div className="flex flex-col">
-            <span className="text-xs font-black text-blue-400 dark:text-yellow-400 uppercase tracking-widest mb-1.5">{label}</span>
-            <span className={`font-bold text-base ${onClick ? 'text-blue-600 dark:text-yellow-300 underline' : 'text-gray-800 dark:text-slate-200'}`}>{value}</span>
+            <span className="text-xs sm:text-sm font-black text-blue-500 dark:text-yellow-400 uppercase tracking-wider mb-1.5">{label}</span>
+            <span className={`font-extrabold text-lg sm:text-xl ${onClick ? 'text-blue-600 dark:text-yellow-300 underline' : 'text-gray-900 dark:text-slate-100'}`}>{value}</span>
         </div>
     </div>
 );
@@ -42,17 +42,17 @@ const ReviewCard: React.FC<{review: Review, currentUserId?: string}> = ({review,
                 <div className="flex-1">
                     <div className="flex justify-between items-center">
                         <div>
-                            <h4 className="font-black text-gray-800 dark:text-slate-100 text-base tracking-tight">
+                            <h4 className="font-black text-gray-900 dark:text-slate-100 text-lg tracking-tight">
                                 {isYou ? 'Tú' : review.authorName}
                             </h4>
-                            <p className="text-xs font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest mt-1">{review.date}</p>
+                            <p className="text-xs sm:text-sm font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider mt-1">{review.date}</p>
                         </div>
                         <div className="bg-yellow-50 dark:bg-slate-800 px-3 py-1 rounded-lg flex items-center border dark:border-slate-700">
                             <StarIcon className="w-4 h-4 text-yellow-500 mr-1" />
-                            <span className="text-sm font-black text-yellow-700 dark:text-yellow-500">{review.rating}</span>
+                            <span className="text-base font-black text-yellow-700 dark:text-yellow-500">{review.rating}</span>
                         </div>
                     </div>
-                    <p className="mt-4 text-gray-700 dark:text-slate-300 text-base leading-relaxed font-medium">{review.comment}</p>
+                    <p className="mt-4 text-gray-800 dark:text-slate-200 text-base sm:text-lg leading-relaxed font-normal">{review.comment}</p>
                 </div>
             </div>
         </div>
@@ -158,7 +158,7 @@ const BusinessDetailPage: React.FC<BusinessDetailPageProps> = ({ business, goBac
                     </div>
                 </div>
             </div>
-            <p className="mt-6 text-gray-600 dark:text-slate-400 text-lg font-medium italic border-l-4 border-blue-500 dark:border-yellow-400 pl-5 leading-relaxed">
+            <p className="mt-6 text-gray-800 dark:text-slate-100 text-lg sm:text-xl font-medium border-l-4 border-blue-500 dark:border-yellow-400 pl-5 leading-relaxed">
                 {business.description}
             </p>
         </div>
@@ -172,17 +172,17 @@ const BusinessDetailPage: React.FC<BusinessDetailPageProps> = ({ business, goBac
                 <div onClick={() => handleOpenDirections()} className="relative rounded-[40px] overflow-hidden cursor-pointer shadow-inner border border-white dark:border-slate-800 bg-blue-100/40 dark:bg-slate-900/40 p-3 group">
                     <div className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm p-6 rounded-[32px] border border-white dark:border-slate-700 shadow-xl group-hover:scale-[1.02] transition-all duration-300 flex items-center justify-between">
                         <div className="flex-1 min-w-0 pr-4">
-                            <p className="text-xs font-black text-blue-400 dark:text-yellow-400 uppercase mb-1 tracking-widest">
+                            <p className="text-xs sm:text-sm font-black text-blue-500 dark:text-yellow-400 uppercase mb-1.5 tracking-wider">
                                 {business.address?.toLowerCase().includes('domicilio') || business.address?.toLowerCase().includes('cobertura') || business.address?.toLowerCase().includes('online') ? 'Zona de Atención' : 'Dirección'}
                             </p>
-                            <p className="text-lg font-bold text-gray-800 dark:text-slate-200 leading-tight">{business.address || 'Isidro Casanova (A Domicilio / Consultar)'}</p>
-                            {business.landmarks && <p className="text-xs text-blue-500 dark:text-yellow-400 font-bold mt-2 uppercase italic tracking-wide truncate">{business.landmarks}</p>}
+                            <p className="text-xl sm:text-2xl font-black text-gray-900 dark:text-slate-100 leading-snug">{business.address || 'Isidro Casanova (A Domicilio / Consultar)'}</p>
+                            {business.landmarks && <p className="text-sm sm:text-base text-blue-600 dark:text-yellow-300 font-bold mt-2 uppercase tracking-wide truncate">{business.landmarks}</p>}
                         </div>
                         <button 
                             onClick={(e) => handleOpenDirections(e)}
                             className="flex flex-col items-center justify-center bg-blue-600 dark:bg-yellow-400 text-white dark:text-slate-950 px-5 py-4 rounded-3xl shadow-lg shadow-blue-200 dark:shadow-slate-900 active:scale-95 transition-all"
                         >
-                            <span className="text-[10px] font-black uppercase tracking-widest mb-1">Mapa</span>
+                            <span className="text-xs font-black uppercase tracking-wider mb-1">Mapa</span>
                             <NavigationIcon className="w-7 h-7" />
                         </button>
                     </div>
@@ -198,19 +198,19 @@ const BusinessDetailPage: React.FC<BusinessDetailPageProps> = ({ business, goBac
                     {business.whatsapp && <InfoRow label="Enviar WhatsApp" value="Chatea directamente" onClick={handleWhatsApp} />}
                     {business.hours && <InfoRow label="Horario de atención" value={business.hours} />}
                     {!business.phone && !business.whatsapp && (
-                        <p className="text-xs text-gray-500 dark:text-slate-400 font-medium italic">Contacto a través de atención presencial o redes sociales.</p>
+                        <p className="text-sm sm:text-base text-gray-600 dark:text-slate-300 font-medium italic">Contacto a través de atención presencial o redes sociales.</p>
                     )}
 
                     {(business.instagram || business.facebook) && (
                         <div className="pt-6 mt-6 border-t border-blue-50 dark:border-slate-700">
-                            <span className="text-xs font-black text-blue-400 dark:text-yellow-400 uppercase tracking-widest block mb-3">Redes Sociales</span>
+                            <span className="text-xs sm:text-sm font-black text-blue-500 dark:text-yellow-400 uppercase tracking-wider block mb-3">Redes Sociales</span>
                             <div className="flex flex-wrap gap-3">
                                 {business.instagram && (
                                     <a
                                         href={`https://instagram.com/${business.instagram.replace(/^@/, '')}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="flex items-center space-x-2 bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500 text-white px-5 py-2.5 rounded-2xl text-xs font-bold shadow-md hover:opacity-95 active:scale-95 transition-all"
+                                        className="flex items-center space-x-2 bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500 text-white px-5 py-2.5 rounded-2xl text-sm font-bold shadow-md hover:opacity-95 active:scale-95 transition-all"
                                     >
                                         <InstagramIcon className="w-4 h-4" />
                                         <span>@{business.instagram.replace(/^@/, '')}</span>
@@ -221,7 +221,7 @@ const BusinessDetailPage: React.FC<BusinessDetailPageProps> = ({ business, goBac
                                         href={business.facebook.startsWith('http') ? business.facebook : `https://www.facebook.com/search/top?q=${encodeURIComponent(business.facebook)}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="flex items-center space-x-2 bg-[#1877F2] text-white px-5 py-2.5 rounded-2xl text-xs font-bold shadow-md hover:opacity-95 active:scale-95 transition-all"
+                                        className="flex items-center space-x-2 bg-[#1877F2] text-white px-5 py-2.5 rounded-2xl text-sm font-bold shadow-md hover:opacity-95 active:scale-95 transition-all"
                                     >
                                         <FacebookIcon className="w-4 h-4" />
                                         <span>{business.facebook}</span>
@@ -235,18 +235,18 @@ const BusinessDetailPage: React.FC<BusinessDetailPageProps> = ({ business, goBac
 
             {business.products && business.products.length > 0 && (
                 <section>
-                    <div className="px-3 mb-2">
-                        <h3 className="text-2xl font-black text-gray-800 dark:text-slate-100 tracking-tight">Servicios e Instalaciones</h3>
+                    <div className="px-3 mb-3">
+                        <h3 className="text-2xl sm:text-3xl font-black text-gray-900 dark:text-slate-100 tracking-tight">Servicios e Instalaciones</h3>
                     </div>
-                    <div className="space-y-3">
+                    <div className="space-y-4">
                         {business.products.map(product => (
-                            <div key={product.id} className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-[32px] p-5 border border-white dark:border-slate-700 shadow-sm flex items-center space-x-4">
+                            <div key={product.id} className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-[32px] p-5 sm:p-6 border border-white dark:border-slate-700 shadow-sm flex items-start space-x-4 sm:space-x-5">
                                 {product.image && (
-                                    <img src={product.image} alt={product.name} className="w-20 h-20 rounded-2xl object-cover flex-shrink-0 shadow-md" />
+                                    <img src={product.image} alt={product.name} className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl object-cover flex-shrink-0 shadow-md mt-0.5" />
                                 )}
                                 <div className="flex-1 min-w-0">
-                                    <h4 className="font-bold text-base text-gray-800 dark:text-slate-100 leading-tight">{product.name}</h4>
-                                    <p className="text-xs text-gray-600 dark:text-slate-400 mt-1 leading-relaxed">{product.description}</p>
+                                    <h4 className="font-extrabold text-lg sm:text-xl text-gray-900 dark:text-slate-100 leading-snug">{product.name}</h4>
+                                    <p className="text-base sm:text-lg text-gray-800 dark:text-slate-200 mt-2 leading-relaxed font-normal">{product.description}</p>
                                 </div>
                             </div>
                         ))}
@@ -283,7 +283,7 @@ const BusinessDetailPage: React.FC<BusinessDetailPageProps> = ({ business, goBac
                     <h3 className="text-2xl font-black text-gray-800 dark:text-slate-100 tracking-tight">Opiniones ({mergedReviews.length})</h3>
                     <button 
                         onClick={navigateToReview}
-                        className="bg-blue-600 dark:bg-yellow-400 text-white dark:text-slate-950 px-6 py-3 rounded-full text-xs font-black uppercase tracking-widest shadow-xl active:scale-95 transition-all"
+                        className="bg-blue-600 dark:bg-yellow-400 text-white dark:text-slate-950 px-6 py-3 rounded-full text-sm font-black uppercase tracking-wider shadow-xl active:scale-95 transition-all"
                     >
                         Dejar Reseña
                     </button>
@@ -293,8 +293,8 @@ const BusinessDetailPage: React.FC<BusinessDetailPageProps> = ({ business, goBac
                         mergedReviews.map(review => <ReviewCard key={review.id} review={review} currentUserId={profile?.id} />)
                     ) : (
                         <div className="text-center py-20">
-                            <p className="text-blue-300 dark:text-yellow-600/30 font-black text-lg italic tracking-wide">Sin opiniones aún</p>
-                            <p className="text-gray-400 dark:text-slate-500 text-sm font-bold mt-2 uppercase tracking-widest">¡Sé el primero en comentar!</p>
+                            <p className="text-blue-300 dark:text-yellow-600/30 font-black text-xl italic tracking-wide">Sin opiniones aún</p>
+                            <p className="text-gray-500 dark:text-slate-400 text-base font-bold mt-2 uppercase tracking-wider">¡Sé el primero en comentar!</p>
                         </div>
                     )}
                 </div>
@@ -307,7 +307,7 @@ const BusinessDetailPage: React.FC<BusinessDetailPageProps> = ({ business, goBac
                 className="flex items-center space-x-3 bg-white dark:bg-slate-800 px-10 py-5 rounded-[24px] shadow-lg border border-blue-50 dark:border-slate-700 active:scale-95 transition-all group transition-colors duration-300"
             >
                 <ChevronLeftIcon className="w-6 h-6 text-gray-400 dark:text-slate-500 group-hover:text-blue-600 dark:group-hover:text-yellow-400" />
-                <span className="font-black text-sm uppercase tracking-[0.3em] text-gray-800 dark:text-slate-200">Volver</span>
+                <span className="font-black text-base uppercase tracking-wider text-gray-800 dark:text-slate-200">Volver</span>
             </button>
         </div>
       </div>
@@ -315,10 +315,10 @@ const BusinessDetailPage: React.FC<BusinessDetailPageProps> = ({ business, goBac
       {business.whatsapp && (
         <button 
             onClick={handleWhatsApp}
-            className="fixed bottom-28 right-6 bg-[#25D366] text-white p-6 rounded-[32px] shadow-2xl shadow-green-200 dark:shadow-slate-900 active:scale-95 transition-all z-50 flex items-center space-x-3"
+            className="fixed bottom-28 right-6 bg-[#25D366] text-white px-7 py-5 rounded-[32px] shadow-2xl shadow-green-200 dark:shadow-slate-900 active:scale-95 transition-all z-50 flex items-center space-x-3"
         >
             <ChatAltIcon className="w-8 h-8" />
-            <span className="font-black text-sm uppercase tracking-widest">Consultar</span>
+            <span className="font-black text-base uppercase tracking-wider">Consultar</span>
         </button>
       )}
 

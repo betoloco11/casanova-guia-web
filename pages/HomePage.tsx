@@ -40,7 +40,7 @@ const CategoryIcon: React.FC<{ category: Category; onClick: () => void }> = ({ c
               loading="lazy"
             />
         </button>
-        <span className="text-xs font-bold text-gray-600 dark:text-slate-400 text-center uppercase tracking-tight">{category.name}</span>
+        <span className="text-sm font-extrabold text-gray-700 dark:text-slate-200 text-center uppercase tracking-tight">{category.name}</span>
     </div>
 );
 
